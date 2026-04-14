@@ -37,14 +37,14 @@ tr:last-child td{border-bottom:none}
 </style>
 
 <div class="row">
-  <label class="upload-btn" for="csvIn">Upload CSV</label>
+  <label class="upload-btn" for="csvIn" style="font-weight:500"><b>Upload CSV</b></label>
   <input type="file" id="csvIn" accept=".csv" style="display:none">
   <span id="fileInfo" style="font-size:13px;color:var(--color-text-secondary)">Upload your CSV to get started</span>
 </div>
 
 <div id="controls" style="display:none">
   <div class="row">
-    <label>Unit:</label>
+    <label style="font-size:15px;font-weight:500"><b>Unit:</b></label>
     <div class="unit-group">
       <button class="unit-btn active" id="btnCE">Case Equivalent (CE)</button>
       <button class="unit-btn" id="btn9L">9-Liter Equivalent (9L)</button>
@@ -52,11 +52,11 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="row">
-    <label>Brand:</label>
+    <label style="font-size:15px;font-weight:500"><b>Brand:</b></label>
     <select id="fBrand"><option value="">All brands</option></select>
-    <label>Distributor:</label>
+    <label style="font-size:15px;font-weight:500"><b>Distributor:</b></label>
     <select id="fDist"><option value="">All distributors</option></select>
-    <label>Item:</label>
+    <label style="font-size:15px;font-weight:500"><b>Item:</b></label>
     <select id="fItem"><option value="">All items</option></select>
   </div>
 </div>
@@ -86,7 +86,7 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="tbox">
-    <h3><b>O</b>ut <b>O</b>f <b>S</b>tock <b>H</b>ighlights <b>B</b>y <b>W</b>eek</h3>
+    <h3 style="font-weight:500"><b>Out Of Stock Highlights By Week</b></h3>
     <div id="noOOS" style="display:none;text-align:center;padding:1.5rem;font-size:13px;color:var(--color-text-secondary)">No OOS events detected for the selected filters.</div>
     <table id="oosTable" style="display:none">
       <thead><tr>
@@ -230,9 +230,9 @@ function render() {
     '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#A32D2D">'+(firstWk!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(firstWk!==null?'Total shortage in W'+firstWk:'No OOS detected')+'</div></div>';
 
   // Update chart/table labels
-  document.getElementById('tROS').textContent = 'Rate of sale by week ('+u+')';
-  document.getElementById('tINB').textContent = 'Inbound by week ('+u+')';
-  document.getElementById('tINV').textContent = 'Projected inventory over time ('+u+')';
+  document.getElementById('tROS').innerHTML = '<b>Rate of sale by week ('+u+')</b>';
+  document.getElementById('tINB').innerHTML = '<b>Inbound by week ('+u+')</b>';
+  document.getElementById('tINV').innerHTML = '<b>Projected inventory over time ('+u+')</b>';
   document.getElementById('lROS').textContent = 'ROS ('+u+'/wk)';
   document.getElementById('lINB').textContent = 'Inbound ('+u+')';
   document.getElementById('hInv').textContent = 'Inventory ('+u+')';
