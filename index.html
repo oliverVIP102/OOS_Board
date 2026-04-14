@@ -1,53 +1,44 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font-sans);background:#F4F5F7;color:#333;padding:0}
-
 .topbar{background:#2D3E50;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
-.topbar-title{color:#fff;font-size:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase}
-.topbar-sub{color:#4AADA8;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;margin-top:2px}
-
-.subbar{background:#3a4f63;padding:8px 24px;display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;flex-wrap:wrap}
+.topbar-left .topbar-title{color:#fff;font-size:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase}
+.topbar-left .topbar-sub{color:#4AADA8;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;margin-top:2px}
+.subbar{background:#3a4f63;padding:8px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:1.5rem}
 .upload-btn{cursor:pointer;padding:6px 16px;border:1.5px solid #4AADA8;border-radius:4px;font-size:12px;font-weight:700;color:#4AADA8;background:transparent;letter-spacing:0.03em}
 .upload-btn:hover{background:#4AADA8;color:#fff}
 #fileInfo{font-size:12px;color:#aac4d0}
-
 .wrap{padding:0 24px 24px}
-
 .section-label{font-size:11px;font-weight:700;color:#2D3E50;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px}
-
-.controls{background:#fff;border:1px solid #DDDDDD;border-radius:4px;padding:14px 16px;margin-bottom:1.5rem;display:none}
+.controls{background:#fff;border:1px solid #DDD;border-radius:4px;padding:14px 16px;margin-bottom:1.5rem;display:none}
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
 .row:last-child{margin-bottom:0}
-.row label{font-size:12px;font-weight:700;color:#2D3E50;min-width:fit-content}
-select{padding:5px 10px;font-size:12px;border-radius:4px;border:1px solid #CCCCCC;background:#fff;color:#333}
+.row label{font-size:12px;font-weight:700;color:#2D3E50}
+select{padding:5px 10px;font-size:12px;border-radius:4px;border:1px solid #CCC;background:#fff;color:#333}
 select:focus{outline:none;border-color:#4AADA8}
-.unit-group{display:flex;border:1px solid #CCCCCC;border-radius:4px;overflow:hidden}
-.unit-btn{padding:6px 16px;font-size:12px;border:none;border-right:1px solid #CCCCCC;background:#fff;color:#555;cursor:pointer;font-weight:500}
+.unit-group{display:flex;border:1px solid #CCC;border-radius:4px;overflow:hidden}
+.unit-btn{padding:6px 16px;font-size:12px;border:none;border-right:1px solid #CCC;background:#fff;color:#555;cursor:pointer;font-weight:500}
 .unit-btn:last-child{border-right:none}
 .unit-btn:hover{background:#f0f0f0}
 .unit-btn.active{background:#4AADA8;color:#fff;font-weight:700}
-
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:1.5rem}
-.mcard{background:#fff;border:1px solid #DDDDDD;border-top:3px solid #4AADA8;border-radius:4px;padding:14px 16px}
+.mcard{background:#fff;border:1px solid #DDD;border-top:3px solid #4AADA8;border-radius:4px;padding:14px 16px}
 .mcard .lbl{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
 .mcard .val{font-size:22px;font-weight:500;color:#2D3E50}
 .mcard .sub{font-size:11px;color:#aaa;margin-top:4px}
-
 .charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:1.5rem}
-.cbox{background:#fff;border:1px solid #DDDDDD;border-radius:4px;padding:16px}
+.cbox{background:#fff;border:1px solid #DDD;border-radius:4px;padding:16px}
 .cbox.full{grid-column:1/-1}
 .ctitle{font-size:11px;font-weight:700;color:#2D3E50;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
 .legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:11px;color:#666}
 .legend span{display:flex;align-items:center;gap:5px}
 .legend i{width:10px;height:10px;border-radius:2px;display:inline-block;flex-shrink:0}
-
-.tbox{background:#fff;border:1px solid #DDDDDD;border-radius:4px;padding:16px;overflow-x:auto;margin-bottom:1rem}
+.tbox{background:#fff;border:1px solid #DDD;border-radius:4px;padding:16px;overflow-x:auto;margin-bottom:1rem}
 .tbox-title{font-size:11px;font-weight:700;color:#2D3E50;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #4AADA8;display:inline-block}
-
 table{width:100%;border-collapse:collapse;font-size:12px}
 th{text-align:right;padding:9px 12px;background:#2D3E50;color:#fff;font-weight:600;font-size:11px;white-space:nowrap;letter-spacing:0.03em}
 th.l,td.l{text-align:left}
-td{padding:9px 12px;border-bottom:1px solid #EEEEEE;color:#333;text-align:right;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #EEE;color:#333;text-align:right;white-space:nowrap}
 tr:hover td{background:#F0FAF9}
 tr:last-child td{border-bottom:none}
 .neg{color:#c0392b;font-weight:600}
@@ -57,7 +48,7 @@ tr:last-child td{border-bottom:none}
 </style>
 
 <div class="topbar">
-  <div>
+  <div class="topbar-left">
     <div class="topbar-title">Inventory &amp; OOS Dashboard</div>
     <div class="topbar-sub">Weekly Performance Overview</div>
   </div>
@@ -70,157 +61,136 @@ tr:last-child td{border-bottom:none}
 </div>
 
 <div class="wrap">
-
-<div class="controls" id="controls">
-  <div class="section-label">Filters &amp; Units</div>
-  <div class="row">
-    <label>Unit:</label>
-    <div class="unit-group">
-      <button class="unit-btn active" id="btnCE">Case Equivalent (CE)</button>
-      <button class="unit-btn" id="btn9L">9-Liter Equivalent (9L)</button>
-      <button class="unit-btn" id="btnUN">Individual Units</button>
-    </div>
-  </div>
-  <div class="row">
-    <label>Brand:</label>
-    <select id="fBrand"><option value="">All brands</option></select>
-    <label>Distributor:</label>
-    <select id="fDist"><option value="">All distributors</option></select>
-    <label>Item:</label>
-    <select id="fItem"><option value="">All items</option></select>
-  </div>
-</div>
-
-<div id="metrics" class="metrics" style="display:none"></div>
-
-<div id="chartsArea" style="display:none">
-  <div class="charts">
-    <div class="cbox">
-      <div class="ctitle" id="tROS"></div>
-      <div class="legend"><span><i style="background:#2D3E50"></i><span id="lROS"></span></span></div>
-      <div style="position:relative;width:100%;height:220px"><canvas id="cROS" role="img" aria-label="Bar chart of rate of sale by week"></canvas></div>
-    </div>
-    <div class="cbox">
-      <div class="ctitle" id="tINB"></div>
-      <div class="legend"><span><i style="background:#4AADA8"></i><span id="lINB"></span></span></div>
-      <div style="position:relative;width:100%;height:220px"><canvas id="cINB" role="img" aria-label="Bar chart of inbound by week"></canvas></div>
-    </div>
-    <div class="cbox full">
-      <div class="ctitle" id="tINV"></div>
-      <div class="legend">
-        <span><i style="background:#2D3E50"></i>On-hand inventory</span>
-        <span><i style="background:#4AADA8"></i>Inbound</span>
-        <span><i style="background:#E67E22"></i>ROS depletion</span>
+  <div class="controls" id="controls">
+    <div class="section-label">Filters &amp; Units</div>
+    <div class="row">
+      <label>Unit:</label>
+      <div class="unit-group">
+        <button class="unit-btn active" id="btnCE">Case Equivalent (CE)</button>
+        <button class="unit-btn" id="btn9L">9-Liter Equivalent (9L)</button>
+        <button class="unit-btn" id="btnUN">Individual Units</button>
       </div>
-      <div style="position:relative;width:100%;height:260px"><canvas id="cINV" role="img" aria-label="Line chart of projected inventory over time"></canvas></div>
+    </div>
+    <div class="row">
+      <label>Brand:</label>
+      <select id="fBrand"><option value="">All brands</option></select>
+      <label>Distributor:</label>
+      <select id="fDist"><option value="">All distributors</option></select>
+      <label>Item:</label>
+      <select id="fItem"><option value="">All items</option></select>
     </div>
   </div>
 
-  <div class="tbox">
-    <div class="tbox-title">Out Of Stock Highlights By Week</div>
-    <div id="noOOS">No OOS events detected for the selected filters.</div>
-    <table id="oosTable" style="display:none">
-      <thead><tr>
-        <th class="l">Item</th>
-        <th class="l">Brand</th>
-        <th class="l">Distributor</th>
-        <th id="hInv">Inventory</th>
-        <th id="hRos">ROS</th>
-        <th id="hShort">Shortage</th>
-      </tr></thead>
-      <tbody id="tBody"></tbody>
-    </table>
-  </div>
-</div>
+  <div id="metrics" class="metrics" style="display:none"></div>
 
+  <div id="chartsArea" style="display:none">
+    <div class="charts">
+      <div class="cbox">
+        <div class="ctitle" id="tROS"></div>
+        <div class="legend"><span><i style="background:#2D3E50"></i><span id="lROS"></span></span></div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="cROS" role="img" aria-label="Rate of sale bar chart"></canvas></div>
+      </div>
+      <div class="cbox">
+        <div class="ctitle" id="tINB"></div>
+        <div class="legend"><span><i style="background:#4AADA8"></i><span id="lINB"></span></span></div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="cINB" role="img" aria-label="Inbound bar chart"></canvas></div>
+      </div>
+      <div class="cbox full">
+        <div class="ctitle" id="tINV"></div>
+        <div class="legend">
+          <span><i style="background:#2D3E50"></i>On-hand inventory</span>
+          <span><i style="background:#4AADA8"></i>Inbound</span>
+          <span><i style="background:#E67E22"></i>ROS depletion</span>
+        </div>
+        <div style="position:relative;width:100%;height:260px"><canvas id="cINV" role="img" aria-label="Projected inventory line chart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="tbox">
+      <div class="tbox-title">Out Of Stock Highlights By Week</div>
+      <div id="noOOS">No OOS events detected for the selected filters.</div>
+      <table id="oosTable" style="display:none">
+        <thead><tr>
+          <th class="l">Item</th><th class="l">Brand</th><th class="l">Distributor</th>
+          <th id="hInv">Inventory</th><th id="hRos">ROS</th><th id="hShort">Shortage</th>
+        </tr></thead>
+        <tbody id="tBody"></tbody>
+      </table>
+    </div>
+  </div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-var UNITS = { CE:{label:'CE',div:288}, NL:{label:'9L',div:304.326}, UN:{label:'Units',div:null} };
-var unitKey = 'CE', allRows = [], weeks = [], chartObjs = {};
+var UNITS={CE:{label:'CE',div:288},NL:{label:'9L',div:304.326},UN:{label:'Units',div:null}};
+var unitKey='CE',allRows=[],weeks=[],chartObjs={};
 
-function splitLine(line) {
-  var cols=[], cur='', inQ=false;
-  for (var i=0; i<line.length; i++) {
-    var ch = line[i];
-    if (ch==='"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
-    else if (ch===',' && !inQ) { cols.push(cur.trim()); cur=''; }
+function splitLine(line){
+  var cols=[],cur='',inQ=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(ch===','&&!inQ){cols.push(cur.trim());cur='';}
     else cur+=ch;
   }
   cols.push(cur.trim());
   return cols;
 }
 
-function parseCSV(text) {
-  var lines = text.trim().split('\n');
-  var headers = splitLine(lines[0]);
-  return lines.slice(1).map(function(line) {
-    var cols=splitLine(line), obj={};
-    headers.forEach(function(h,i){ obj[h]=cols[i]||''; });
+function parseCSV(text){
+  var lines=text.trim().split('\n'),headers=splitLine(lines[0]);
+  return lines.slice(1).map(function(line){
+    var cols=splitLine(line),obj={};
+    headers.forEach(function(h,i){obj[h]=cols[i]||'';});
     return obj;
-  }).filter(function(r){ return Object.keys(r).length > 2; });
+  }).filter(function(r){return Object.keys(r).length>2;});
 }
 
-function detectWeeks(headers) {
+function detectWeeks(headers){
   var seen={};
-  headers.forEach(function(h){ var m=h.match(/^W(\d+)\s/i); if(m) seen[parseInt(m[1])]=1; });
+  headers.forEach(function(h){var m=h.match(/^W(\d+)\s/i);if(m)seen[parseInt(m[1])]=1;});
   return Object.keys(seen).map(Number).sort(function(a,b){return a-b;});
 }
 
-function num(v) { var x=parseFloat(v); return isNaN(x)?0:x; }
+function num(v){var x=parseFloat(v);return isNaN(x)?0:x;}
+function conv(units,oz){return unitKey==='UN'?num(units):(num(units)*num(oz))/UNITS[unitKey].div;}
+function ul(){return UNITS[unitKey].label;}
+function fmt(v){return unitKey==='UN'?Math.round(v).toLocaleString():v.toFixed(2);}
+function fnum(v){return parseFloat(String(fmt(v)).replace(/,/g,''));}
 
-function conv(units, oz) {
-  if (unitKey==='UN') return num(units);
-  return (num(units)*num(oz)) / UNITS[unitKey].div;
-}
-
-function ul() { return UNITS[unitKey].label; }
-
-function fmt(v) {
-  return unitKey==='UN' ? Math.round(v).toLocaleString() : v.toFixed(2);
-}
-
-function fnum(v) { return parseFloat(String(fmt(v)).replace(/,/g,'')); }
-
-function populateSel(id, rows, valFn, labelFn) {
+function populateSel(id,rows,valFn,labelFn){
   var sel=document.getElementById(id);
-  while (sel.options.length>1) sel.remove(1);
+  while(sel.options.length>1)sel.remove(1);
   var map={};
-  rows.forEach(function(r){ var v=valFn(r); if(v&&!map[v]) map[v]=labelFn?labelFn(r):v; });
+  rows.forEach(function(r){var v=valFn(r);if(v&&!map[v])map[v]=labelFn?labelFn(r):v;});
   Object.keys(map).sort().forEach(function(v){
     var o=document.createElement('option');
-    o.value=v; o.textContent=labelFn?v+' — '+map[v]:v;
+    o.value=v;o.textContent=labelFn?v+' \u2014 '+map[v]:v;
     sel.appendChild(o);
   });
 }
 
-function getFiltered() {
+function getFiltered(){
   var b=document.getElementById('fBrand').value;
   var d=document.getElementById('fDist').value;
   var it=document.getElementById('fItem').value;
   return allRows.filter(function(r){
-    return (!b||r['brand']===b) && (!d||r['Distributor']===d) && (!it||r['SupplierItem']===it);
+    return(!b||r['brand']===b)&&(!d||r['Distributor']===d)&&(!it||r['SupplierItem']===it);
   });
 }
 
-function killChart(id) { if(chartObjs[id]){ chartObjs[id].destroy(); delete chartObjs[id]; } }
+function killChart(id){if(chartObjs[id]){chartObjs[id].destroy();delete chartObjs[id];}}
 
-function render() {
+function render(){
   var rows=getFiltered();
-  if (!rows.length) return;
+  if(!rows.length)return;
+  var u=ul(),wl=weeks.map(function(w){return'W'+w;}),gc='rgba(0,0,0,0.05)',tc='#999';
 
-  var u=ul();
-  var wl=weeks.map(function(w){return 'W'+w;});
-  var gc='rgba(0,0,0,0.05)', tc='#999';
-
-  var ohCE = rows.reduce(function(s,r){return s+conv(r['On-Hand Begin'],r['oz']);},0);
-  var ros  = weeks.map(function(w){return rows.reduce(function(s,r){return s+conv(r['W'+w+' ros'],r['oz']);},0);});
-  var inb  = weeks.map(function(w){return rows.reduce(function(s,r){return s+conv(r['W'+w+' inbound'],r['oz']);},0);});
-
-  var cur=ohCE;
-  var inv=weeks.map(function(w,i){ cur=Math.max(0,cur+inb[i]-ros[i]); return cur; });
-
+  var ohCE=rows.reduce(function(s,r){return s+conv(r['On-Hand Begin'],r['oz']);},0);
+  var ros=weeks.map(function(w){return rows.reduce(function(s,r){return s+conv(r['W'+w+' ros'],r['oz']);},0);});
+  var inb=weeks.map(function(w){return rows.reduce(function(s,r){return s+conv(r['W'+w+' inbound'],r['oz']);},0);});
+  var invCur=ohCE;
+  var inv=weeks.map(function(w,i){invCur=Math.max(0,invCur+inb[i]-ros[i]);return invCur;});
   var totalROS=ros.reduce(function(a,v){return a+v;},0);
   var totalInb=inb.reduce(function(a,v){return a+v;},0);
   var avgROS=weeks.length?totalROS/weeks.length:0;
@@ -228,28 +198,29 @@ function render() {
   // OOS per row per week
   var oos=[];
   rows.forEach(function(r){
-    var runInv=conv(r['On-Hand Begin'],r['oz']);
+    var ri=conv(r['On-Hand Begin'],r['oz']);
     weeks.forEach(function(w){
-      var wR=conv(r['W'+w+' ros'],r['oz']);
-      var wI=conv(r['W'+w+' inbound'],r['oz']);
-      var avail=runInv+wI;
-      runInv=avail-wR;
-      if (wR>avail) oos.push({week:w,item:r['SupplierItem']||'—',brand:r['brand']||'—',dist:r['Distributor']||'—',avail:Math.max(0,avail),ros:wR,shortage:wR-avail});
+      var wR=conv(r['W'+w+' ros'],r['oz']),wI=conv(r['W'+w+' inbound'],r['oz']);
+      var avail=ri+wI;
+      ri=avail-wR;
+      if(wR>avail)oos.push({week:w,item:r['SupplierItem']||'\u2014',brand:r['brand']||'\u2014',dist:r['Distributor']||'\u2014',avail:Math.max(0,avail),ros:wR,shortage:wR-avail});
     });
   });
 
-  var fw=oos.length?Math.min.apply(null,oos.map(function(e){return e.week;})):null;
+  // First week with OOS for metric card
+  var oosWkNums=oos.reduce(function(acc,e){acc[e.week]=1;return acc;},{});
+  var sortedOOSWks=Object.keys(oosWkNums).map(Number).sort(function(a,b){return a-b;});
+  var fw=sortedOOSWks.length?sortedOOSWks[0]:null;
   var curOOS=fw!==null?oos.filter(function(e){return e.week===fw;}).reduce(function(s,e){return s+e.shortage;},0):0;
 
   // Metrics
   document.getElementById('metrics').style.display='grid';
   document.getElementById('metrics').innerHTML=
     '<div class="mcard"><div class="lbl">Starting inventory</div><div class="val">'+fmt(ohCE)+' '+u+'</div><div class="sub">On-hand begin</div></div>'+
-    '<div class="mcard"><div class="lbl">Total inbound</div><div class="val">'+fmt(totalInb)+' '+u+'</div><div class="sub">W'+weeks[0]+'–W'+weeks[weeks.length-1]+'</div></div>'+
+    '<div class="mcard"><div class="lbl">Total inbound</div><div class="val">'+fmt(totalInb)+' '+u+'</div><div class="sub">W'+weeks[0]+'\u2013W'+weeks[weeks.length-1]+'</div></div>'+
     '<div class="mcard"><div class="lbl">Total depleted (ROS)</div><div class="val">'+fmt(totalROS)+' '+u+'</div><div class="sub">Avg '+fmt(avgROS)+' '+u+'/wk</div></div>'+
     '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#c0392b">'+(fw!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(fw!==null?'Total shortage W'+fw:'No OOS detected')+'</div></div>';
 
-  // Chart labels
   document.getElementById('tROS').textContent='Rate of Sale by Week ('+u+')';
   document.getElementById('tINB').textContent='Inbound by Week ('+u+')';
   document.getElementById('tINV').textContent='Projected Inventory Over Time ('+u+')';
@@ -263,16 +234,14 @@ function render() {
 
   killChart('ros');
   chartObjs['ros']=new Chart(document.getElementById('cROS'),{
-    type:'bar',
-    data:{labels:wl,datasets:[{label:'ROS',data:ros.map(fnum),backgroundColor:'#2D3E50',borderRadius:3}]},
+    type:'bar',data:{labels:wl,datasets:[{label:'ROS',data:ros.map(fnum),backgroundColor:'#2D3E50',borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
 
   killChart('inb');
   chartObjs['inb']=new Chart(document.getElementById('cINB'),{
-    type:'bar',
-    data:{labels:wl,datasets:[{label:'Inbound',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
+    type:'bar',data:{labels:wl,datasets:[{label:'Inbound',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
@@ -292,54 +261,63 @@ function render() {
   // OOS table
   var noOOS=document.getElementById('noOOS');
   var oosTable=document.getElementById('oosTable');
-  if (!oos.length) {
-    noOOS.style.display='block'; oosTable.style.display='none';
+  if(!oos.length){
+    noOOS.style.display='block';
+    oosTable.style.display='none';
     document.getElementById('tBody').innerHTML='';
     return;
   }
-  noOOS.style.display='none'; oosTable.style.display='table';
+  noOOS.style.display='none';
+  oosTable.style.display='table';
 
+  // Build top-5 per week map (sorted by shortage desc)
   var byWeek={};
   oos.sort(function(a,b){return a.week-b.week||b.shortage-a.shortage;}).forEach(function(e){
-    if(!byWeek[e.week]) byWeek[e.week]=[];
-    if(byWeek[e.week].length<5) byWeek[e.week].push(e);
+    if(!byWeek[e.week])byWeek[e.week]=[];
+    if(byWeek[e.week].length<5)byWeek[e.week].push(e);
   });
 
-  document.getElementById('tBody').innerHTML=Object.keys(byWeek).map(function(w,wi){
-    var evts=byWeek[w], hcls=wi===0?'whdr first':'whdr';
-    return '<tr class="'+hcls+'"><td class="l" colspan="6" style="padding:10px 12px">W'+w+' &mdash; Top '+evts.length+' OOS Events</td></tr>'+
-      evts.map(function(e){
+  document.getElementById('tBody').innerHTML=sortedOOSWks.map(function(w,wi){
+    var top5=byWeek[w];
+    var allEvts=oos.filter(function(e){return e.week===w;});
+    var trueTotal=allEvts.reduce(function(s,e){return s+e.shortage;},0);
+    var hcls=wi===0?'whdr first':'whdr';
+    return '<tr class="'+hcls+'"><td class="l" colspan="6" style="padding:10px 12px">W'+w+' \u2014 Top '+top5.length+' OOS Events</td></tr>'+
+      top5.map(function(e){
         return '<tr><td class="l">'+e.item+'</td><td class="l">'+e.brand+'</td><td class="l">'+e.dist+'</td>'+
-               '<td>'+fmt(e.avail)+' '+u+'</td><td>'+fmt(e.ros)+' '+u+'</td><td class="neg">'+fmt(e.shortage)+' '+u+'</td></tr>';
-      }).join('');
+               '<td>'+fmt(e.avail)+' '+u+'</td><td>'+fmt(e.ros)+' '+u+'</td>'+
+               '<td class="neg">'+fmt(e.shortage)+' '+u+'</td></tr>';
+      }).join('')+
+      '<tr style="background:#f7fdfc;border-top:1.5px solid #4AADA8">'+
+        '<td class="l" colspan="3" style="font-weight:700;color:#2D3E50;font-size:11px;text-transform:uppercase;letter-spacing:0.04em">Total</td>'+
+        '<td colspan="2"></td>'+
+        '<td style="font-weight:700;color:#c0392b">'+fmt(trueTotal)+' '+u+'</td>'+
+      '</tr>';
   }).join('');
 }
 
-// Unit toggle
 var btns={CE:document.getElementById('btnCE'),NL:document.getElementById('btn9L'),UN:document.getElementById('btnUN')};
 Object.keys(btns).forEach(function(k){
   btns[k].addEventListener('click',function(){
     unitKey=k;
     Object.keys(btns).forEach(function(b){btns[b].classList.toggle('active',b===k);});
-    if(allRows.length) render();
+    if(allRows.length)render();
   });
 });
 
-// Filters
 ['fBrand','fDist','fItem'].forEach(function(id){
   document.getElementById(id).addEventListener('change',render);
 });
 
-// CSV
 document.getElementById('csvIn').addEventListener('change',function(e){
-  var file=e.target.files[0]; if(!file) return;
+  var file=e.target.files[0];if(!file)return;
   var reader=new FileReader();
   reader.onload=function(ev){
     allRows=parseCSV(ev.target.result);
     if(!allRows.length){document.getElementById('fileInfo').textContent='Could not parse CSV.';return;}
     weeks=detectWeeks(Object.keys(allRows[0]));
     if(!weeks.length){document.getElementById('fileInfo').textContent='No weekly columns found (expected W## ros / W## inbound).';return;}
-    document.getElementById('fileInfo').textContent='Loaded '+allRows.length+' rows · W'+weeks[0]+'–W'+weeks[weeks.length-1];
+    document.getElementById('fileInfo').textContent='Loaded '+allRows.length+' rows \u00b7 W'+weeks[0]+'\u2013W'+weeks[weeks.length-1];
     populateSel('fBrand',allRows,function(r){return r['brand'];});
     populateSel('fDist', allRows,function(r){return r['Distributor'];});
     populateSel('fItem', allRows,function(r){return r['SupplierItem'];},function(r){return(r['brand']+' '+r['size']).trim();});
