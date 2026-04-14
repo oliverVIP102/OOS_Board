@@ -1,9 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inventory & OOS Dashboard</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:#F4F5F7;color:#333;padding:0}
-.topbar{background:#2D3E50;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
-.topbar-left .topbar-title{color:#fff;font-size:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase}
-.topbar-left .topbar-sub{color:#4AADA8;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;margin-top:2px}
+.topbar{background:#2D3E50;padding:14px 24px;display:flex;align-items:center;justify-content:space-between}
+.topbar-title{color:#fff;font-size:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase}
+.topbar-sub{color:#4AADA8;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;margin-top:2px}
 .subbar{background:#3a4f63;padding:8px 24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:1.5rem}
 .upload-btn{cursor:pointer;padding:6px 16px;border:1.5px solid #4AADA8;border-radius:4px;font-size:12px;font-weight:700;color:#4AADA8;background:transparent;letter-spacing:0.03em}
 .upload-btn:hover{background:#4AADA8;color:#fff}
@@ -46,9 +52,11 @@ tr:last-child td{border-bottom:none}
 .whdr.first td{border-top:none}
 #noOOS{text-align:center;padding:2rem;font-size:13px;color:#aaa;display:none}
 </style>
+</head>
+<body>
 
 <div class="topbar">
-  <div class="topbar-left">
+  <div>
     <div class="topbar-title">Inventory &amp; OOS Dashboard</div>
     <div class="topbar-sub">Weekly Performance Overview</div>
   </div>
@@ -192,8 +200,6 @@ function render(){
   var invCur=ohCE;
   var inv=weeks.map(function(w,i){invCur=Math.max(0,invCur+inb[i]-ros[i]);return invCur;});
 
-
-  // OOS per row per week
   var oos=[];
   rows.forEach(function(r){
     var ri=conv(r['On-Hand Begin'],r['oz']);
@@ -205,19 +211,15 @@ function render(){
     });
   });
 
-  // First OOS week
   var oosWkNums=oos.reduce(function(acc,e){acc[e.week]=1;return acc;},{});
   var sortedOOSWks=Object.keys(oosWkNums).map(Number).sort(function(a,b){return a-b;});
   var fw=sortedOOSWks.length?sortedOOSWks[0]:null;
-
-  // Metrics derived from first OOS week
   var firstWkIdx=fw!==null?weeks.indexOf(fw):-1;
   var firstWkROS=firstWkIdx>=0?ros[firstWkIdx]:0;
   var firstWkInb=firstWkIdx>=0?inb[firstWkIdx]:0;
   var curOOS=fw!==null?oos.filter(function(e){return e.week===fw;}).reduce(function(s,e){return s+e.shortage;},0):0;
   var oosPct=firstWkROS>0?(curOOS/firstWkROS)*100:0;
 
-  // Metrics
   document.getElementById('metrics').style.display='grid';
   document.getElementById('metrics').innerHTML=
     '<div class="mcard"><div class="lbl">Distributor Inventory</div><div class="val">'+Math.round(ohCE)+' '+u+'</div><div class="sub">On-hand begin</div></div>'+
@@ -225,7 +227,6 @@ function render(){
     '<div class="mcard"><div class="lbl">OOS %</div><div class="val" style="color:#c0392b">'+(fw!==null?oosPct.toFixed(1)+'%':'N/A')+'</div><div class="sub">'+(fw!==null?'OOS \u00f7 ROS in W'+fw:'No OOS detected')+'</div></div>'+
     '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#c0392b">'+(fw!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(fw!==null?'Total shortage W'+fw:'No OOS detected')+'</div></div>';
 
-  // Chart labels
   document.getElementById('tROS').textContent='Rate of Sale by Week ('+u+')';
   document.getElementById('tINB').textContent='Shipped to Dist by Week ('+u+')';
   document.getElementById('tINV').textContent='Projected Inventory Over Time ('+u+')';
@@ -263,7 +264,6 @@ function render(){
       scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
 
-  // OOS table
   var noOOS=document.getElementById('noOOS');
   var oosTable=document.getElementById('oosTable');
   if(!oos.length){
@@ -288,7 +288,6 @@ function render(){
     var hcls=wi===0?'whdr first':'whdr';
     return '<tr class="'+hcls+'"><td class="l" colspan="7" style="padding:10px 12px">W'+w+' \u2014 Top '+top5.length+' OOS Events</td></tr>'+
       top5.map(function(e){
-        // Find next week with inbound > 0 for this row
         var nextWk=null,nextQty=0;
         for(var i=weeks.indexOf(e.week);i<weeks.length;i++){
           var chkW=weeks[i];
@@ -343,3 +342,5 @@ document.getElementById('csvIn').addEventListener('change',function(e){
   reader.readAsText(file);
 });
 </script>
+</body>
+</html>
