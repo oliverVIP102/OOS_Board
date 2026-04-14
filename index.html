@@ -1,50 +1,80 @@
-<h2 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Weekly inventory dashboard showing rate of sale, inbound units, and OOS highlights</h2>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font-sans);color:var(--color-text-primary);padding:1rem 0}
-.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:1.25rem}
-.row label{font-size:15px;font-weight:500;color:var(--color-text-secondary)}
-.upload-btn{cursor:pointer;padding:6px 14px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;color:var(--color-text-primary);background:var(--color-background-primary)}
-.upload-btn:hover{background:var(--color-background-secondary)}
-select{padding:5px 10px;font-size:13px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-primary)}
-.unit-group{display:flex;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);overflow:hidden;width:fit-content}
-.unit-btn{padding:6px 20px;font-size:13px;border:none;border-right:0.5px solid var(--color-border-secondary);background:var(--color-background-primary);color:var(--color-text-secondary);cursor:pointer}
+body{font-family:var(--font-sans);background:#F4F5F7;color:#333;padding:0}
+
+.topbar{background:#2D3E50;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;margin-bottom:0}
+.topbar-title{color:#fff;font-size:16px;font-weight:500;letter-spacing:0.04em;text-transform:uppercase}
+.topbar-sub{color:#4AADA8;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;margin-top:2px}
+
+.subbar{background:#3a4f63;padding:8px 24px;display:flex;align-items:center;gap:16px;margin-bottom:1.5rem;flex-wrap:wrap}
+.upload-btn{cursor:pointer;padding:6px 16px;border:1.5px solid #4AADA8;border-radius:4px;font-size:12px;font-weight:700;color:#4AADA8;background:transparent;letter-spacing:0.03em}
+.upload-btn:hover{background:#4AADA8;color:#fff}
+#fileInfo{font-size:12px;color:#aac4d0}
+
+.wrap{padding:0 24px 24px}
+
+.section-label{font-size:11px;font-weight:700;color:#2D3E50;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px}
+
+.controls{background:#fff;border:1px solid #DDDDDD;border-radius:4px;padding:14px 16px;margin-bottom:1.5rem;display:none}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.row:last-child{margin-bottom:0}
+.row label{font-size:12px;font-weight:700;color:#2D3E50;min-width:fit-content}
+select{padding:5px 10px;font-size:12px;border-radius:4px;border:1px solid #CCCCCC;background:#fff;color:#333}
+select:focus{outline:none;border-color:#4AADA8}
+.unit-group{display:flex;border:1px solid #CCCCCC;border-radius:4px;overflow:hidden}
+.unit-btn{padding:6px 16px;font-size:12px;border:none;border-right:1px solid #CCCCCC;background:#fff;color:#555;cursor:pointer;font-weight:500}
 .unit-btn:last-child{border-right:none}
-.unit-btn:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
-.unit-btn.active{background:var(--color-background-secondary);color:var(--color-text-primary);font-weight:500}
+.unit-btn:hover{background:#f0f0f0}
+.unit-btn.active{background:#4AADA8;color:#fff;font-weight:700}
+
 .metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:1.5rem}
-.mcard{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem}
-.mcard .lbl{font-size:14px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px}
-.mcard .val{font-size:22px;font-weight:500}
-.mcard .sub{font-size:11px;color:var(--color-text-secondary);margin-top:4px}
-.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin-bottom:1.5rem}
-.chart-box{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem}
-.chart-box.full{grid-column:1/-1}
-.ctitle{font-size:14px;font-weight:500;margin-bottom:10px;color:var(--color-text-secondary)}
-.legend{display:flex;flex-wrap:wrap;gap:12px;margin-bottom:10px;font-size:12px;color:var(--color-text-secondary)}
-.legend span{display:flex;align-items:center;gap:4px}
-.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
-.tbox{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;overflow-x:auto;margin-bottom:1rem}
-.tbox h3{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:12px}
+.mcard{background:#fff;border:1px solid #DDDDDD;border-top:3px solid #4AADA8;border-radius:4px;padding:14px 16px}
+.mcard .lbl{font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.mcard .val{font-size:22px;font-weight:500;color:#2D3E50}
+.mcard .sub{font-size:11px;color:#aaa;margin-top:4px}
+
+.charts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:1.5rem}
+.cbox{background:#fff;border:1px solid #DDDDDD;border-radius:4px;padding:16px}
+.cbox.full{grid-column:1/-1}
+.ctitle{font-size:11px;font-weight:700;color:#2D3E50;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:8px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:10px;font-size:11px;color:#666}
+.legend span{display:flex;align-items:center;gap:5px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block;flex-shrink:0}
+
+.tbox{background:#fff;border:1px solid #DDDDDD;border-radius:4px;padding:16px;overflow-x:auto;margin-bottom:1rem}
+.tbox-title{font-size:11px;font-weight:700;color:#2D3E50;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:14px;padding-bottom:10px;border-bottom:2px solid #4AADA8;display:inline-block}
+
 table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:right;padding:7px 10px;color:var(--color-text-secondary);font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary);font-size:11px;white-space:nowrap}
+th{text-align:right;padding:9px 12px;background:#2D3E50;color:#fff;font-weight:600;font-size:11px;white-space:nowrap;letter-spacing:0.03em}
 th.l,td.l{text-align:left}
-td{padding:7px 10px;border-bottom:0.5px solid var(--color-border-tertiary);color:var(--color-text-primary);text-align:right;white-space:nowrap}
+td{padding:9px 12px;border-bottom:1px solid #EEEEEE;color:#333;text-align:right;white-space:nowrap}
+tr:hover td{background:#F0FAF9}
 tr:last-child td{border-bottom:none}
-.neg{color:#A32D2D}
-.whdr td{background:var(--color-background-secondary);font-size:13px;font-weight:500;border-top:2.5px solid var(--color-border-primary)}
+.neg{color:#c0392b;font-weight:600}
+.whdr td{background:#EAF6F5;font-size:11px;font-weight:700;color:#2D3E50;border-top:2px solid #4AADA8;text-transform:uppercase;letter-spacing:0.05em}
 .whdr.first td{border-top:none}
+#noOOS{text-align:center;padding:2rem;font-size:13px;color:#aaa;display:none}
 </style>
 
-<div class="row">
-  <label class="upload-btn" for="csvIn" style="font-weight:500"><b>Upload CSV</b></label>
-  <input type="file" id="csvIn" accept=".csv" style="display:none">
-  <span id="fileInfo" style="font-size:13px;color:var(--color-text-secondary)">Upload your CSV to get started</span>
+<div class="topbar">
+  <div>
+    <div class="topbar-title">Inventory &amp; OOS Dashboard</div>
+    <div class="topbar-sub">Weekly Performance Overview</div>
+  </div>
 </div>
 
-<div id="controls" style="display:none">
+<div class="subbar">
+  <label class="upload-btn" for="csvIn">&#8593; Upload CSV</label>
+  <input type="file" id="csvIn" accept=".csv" style="display:none">
+  <span id="fileInfo">No file loaded — upload a CSV to begin</span>
+</div>
+
+<div class="wrap">
+
+<div class="controls" id="controls">
+  <div class="section-label">Filters &amp; Units</div>
   <div class="row">
-    <label style="font-size:15px;font-weight:500"><b>Unit:</b></label>
+    <label>Unit:</label>
     <div class="unit-group">
       <button class="unit-btn active" id="btnCE">Case Equivalent (CE)</button>
       <button class="unit-btn" id="btn9L">9-Liter Equivalent (9L)</button>
@@ -52,11 +82,11 @@ tr:last-child td{border-bottom:none}
     </div>
   </div>
   <div class="row">
-    <label style="font-size:15px;font-weight:500"><b>Brand:</b></label>
+    <label>Brand:</label>
     <select id="fBrand"><option value="">All brands</option></select>
-    <label style="font-size:15px;font-weight:500"><b>Distributor:</b></label>
+    <label>Distributor:</label>
     <select id="fDist"><option value="">All distributors</option></select>
-    <label style="font-size:15px;font-weight:500"><b>Item:</b></label>
+    <label>Item:</label>
     <select id="fItem"><option value="">All items</option></select>
   </div>
 </div>
@@ -65,60 +95,58 @@ tr:last-child td{border-bottom:none}
 
 <div id="chartsArea" style="display:none">
   <div class="charts">
-    <div class="chart-box">
-      <div class="ctitle" id="tROS">Rate of sale by week</div>
-      <div class="legend"><span><i style="background:#185FA5"></i><span id="lROS">ROS</span></span></div>
+    <div class="cbox">
+      <div class="ctitle" id="tROS"></div>
+      <div class="legend"><span><i style="background:#2D3E50"></i><span id="lROS"></span></span></div>
       <div style="position:relative;width:100%;height:220px"><canvas id="cROS" role="img" aria-label="Bar chart of rate of sale by week"></canvas></div>
     </div>
-    <div class="chart-box">
-      <div class="ctitle" id="tINB">Inbound by week</div>
-      <div class="legend"><span><i style="background:#1D9E75"></i><span id="lINB">Inbound</span></span></div>
+    <div class="cbox">
+      <div class="ctitle" id="tINB"></div>
+      <div class="legend"><span><i style="background:#4AADA8"></i><span id="lINB"></span></span></div>
       <div style="position:relative;width:100%;height:220px"><canvas id="cINB" role="img" aria-label="Bar chart of inbound by week"></canvas></div>
     </div>
-    <div class="chart-box full">
-      <div class="ctitle" id="tINV">Projected inventory over time</div>
+    <div class="cbox full">
+      <div class="ctitle" id="tINV"></div>
       <div class="legend">
-        <span><i style="background:#185FA5"></i>On-hand</span>
-        <span><i style="background:#1D9E75"></i>Inbound</span>
-        <span><i style="background:#BA7517"></i>ROS</span>
+        <span><i style="background:#2D3E50"></i>On-hand inventory</span>
+        <span><i style="background:#4AADA8"></i>Inbound</span>
+        <span><i style="background:#E67E22"></i>ROS depletion</span>
       </div>
       <div style="position:relative;width:100%;height:260px"><canvas id="cINV" role="img" aria-label="Line chart of projected inventory over time"></canvas></div>
     </div>
   </div>
+
   <div class="tbox">
-    <h3 style="font-weight:500"><b>Out Of Stock Highlights By Week</b></h3>
-    <div id="noOOS" style="display:none;text-align:center;padding:1.5rem;font-size:13px;color:var(--color-text-secondary)">No OOS events detected for the selected filters.</div>
+    <div class="tbox-title">Out Of Stock Highlights By Week</div>
+    <div id="noOOS">No OOS events detected for the selected filters.</div>
     <table id="oosTable" style="display:none">
       <thead><tr>
-        <th class="l">Item</th><th class="l">Brand</th><th class="l">Distributor</th>
-        <th id="hInv">Inventory</th><th id="hRos">ROS</th><th id="hShort">Shortage</th>
+        <th class="l">Item</th>
+        <th class="l">Brand</th>
+        <th class="l">Distributor</th>
+        <th id="hInv">Inventory</th>
+        <th id="hRos">ROS</th>
+        <th id="hShort">Shortage</th>
       </tr></thead>
       <tbody id="tBody"></tbody>
     </table>
   </div>
 </div>
 
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-var UNITS = {
-  CE: { label: 'CE',    div: 288 },
-  NL: { label: '9L',   div: 304.326 },
-  UN: { label: 'Units', div: null }
-};
-var unitKey = 'CE';
-var allRows = [], weeks = [];
-var chartObjs = {};
+var UNITS = { CE:{label:'CE',div:288}, NL:{label:'9L',div:304.326}, UN:{label:'Units',div:null} };
+var unitKey = 'CE', allRows = [], weeks = [], chartObjs = {};
 
 function splitLine(line) {
-  var cols = [], cur = '', inQ = false;
-  for (var i = 0; i < line.length; i++) {
+  var cols=[], cur='', inQ=false;
+  for (var i=0; i<line.length; i++) {
     var ch = line[i];
-    if (ch === '"') {
-      if (inQ && line[i+1] === '"') { cur += '"'; i++; }
-      else inQ = !inQ;
-    } else if (ch === ',' && !inQ) {
-      cols.push(cur.trim()); cur = '';
-    } else cur += ch;
+    if (ch==='"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
+    else if (ch===',' && !inQ) { cols.push(cur.trim()); cur=''; }
+    else cur+=ch;
   }
   cols.push(cur.trim());
   return cols;
@@ -128,150 +156,142 @@ function parseCSV(text) {
   var lines = text.trim().split('\n');
   var headers = splitLine(lines[0]);
   return lines.slice(1).map(function(line) {
-    var cols = splitLine(line), obj = {};
-    headers.forEach(function(h, i) { obj[h] = cols[i] || ''; });
+    var cols=splitLine(line), obj={};
+    headers.forEach(function(h,i){ obj[h]=cols[i]||''; });
     return obj;
-  }).filter(function(r) { return Object.keys(r).length > 2; });
+  }).filter(function(r){ return Object.keys(r).length > 2; });
 }
 
 function detectWeeks(headers) {
-  var seen = {};
-  headers.forEach(function(h) { var m = h.match(/^W(\d+)\s/i); if (m) seen[parseInt(m[1])] = 1; });
+  var seen={};
+  headers.forEach(function(h){ var m=h.match(/^W(\d+)\s/i); if(m) seen[parseInt(m[1])]=1; });
   return Object.keys(seen).map(Number).sort(function(a,b){return a-b;});
 }
 
-function num(v) { var x = parseFloat(v); return isNaN(x) ? 0 : x; }
+function num(v) { var x=parseFloat(v); return isNaN(x)?0:x; }
 
 function conv(units, oz) {
-  if (unitKey === 'UN') return num(units);
-  return (num(units) * num(oz)) / UNITS[unitKey].div;
+  if (unitKey==='UN') return num(units);
+  return (num(units)*num(oz)) / UNITS[unitKey].div;
 }
 
 function ul() { return UNITS[unitKey].label; }
 
 function fmt(v) {
-  return (unitKey === 'UN') ? Math.round(v).toLocaleString() : v.toFixed(2);
+  return unitKey==='UN' ? Math.round(v).toLocaleString() : v.toFixed(2);
 }
 
-function populateSel(selId, rows, valFn, labelFn) {
-  var sel = document.getElementById(selId);
-  while (sel.options.length > 1) sel.remove(1);
-  var map = {};
-  rows.forEach(function(r) {
-    var v = valFn(r);
-    if (v && !map[v]) map[v] = labelFn ? labelFn(r) : v;
-  });
-  Object.keys(map).sort().forEach(function(v) {
-    var o = document.createElement('option');
-    o.value = v;
-    o.textContent = labelFn ? v + ' — ' + map[v] : v;
+function fnum(v) { return parseFloat(String(fmt(v)).replace(/,/g,'')); }
+
+function populateSel(id, rows, valFn, labelFn) {
+  var sel=document.getElementById(id);
+  while (sel.options.length>1) sel.remove(1);
+  var map={};
+  rows.forEach(function(r){ var v=valFn(r); if(v&&!map[v]) map[v]=labelFn?labelFn(r):v; });
+  Object.keys(map).sort().forEach(function(v){
+    var o=document.createElement('option');
+    o.value=v; o.textContent=labelFn?v+' — '+map[v]:v;
     sel.appendChild(o);
   });
 }
 
 function getFiltered() {
-  var b  = document.getElementById('fBrand').value;
-  var d  = document.getElementById('fDist').value;
-  var it = document.getElementById('fItem').value;
-  return allRows.filter(function(r) {
-    return (!b  || r['brand'] === b) &&
-           (!d  || r['Distributor'] === d) &&
-           (!it || r['SupplierItem'] === it);
+  var b=document.getElementById('fBrand').value;
+  var d=document.getElementById('fDist').value;
+  var it=document.getElementById('fItem').value;
+  return allRows.filter(function(r){
+    return (!b||r['brand']===b) && (!d||r['Distributor']===d) && (!it||r['SupplierItem']===it);
   });
 }
 
-function killChart(id) { if (chartObjs[id]) { chartObjs[id].destroy(); delete chartObjs[id]; } }
+function killChart(id) { if(chartObjs[id]){ chartObjs[id].destroy(); delete chartObjs[id]; } }
 
 function render() {
-  var rows = getFiltered();
+  var rows=getFiltered();
   if (!rows.length) return;
 
-  var isDark = matchMedia('(prefers-color-scheme: dark)').matches;
-  var gc = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)';
-  var tc = isDark ? '#a0a09a' : '#73726c';
-  var u  = ul();
-  var wl = weeks.map(function(w) { return 'W' + w; });
+  var u=ul();
+  var wl=weeks.map(function(w){return 'W'+w;});
+  var gc='rgba(0,0,0,0.05)', tc='#999';
 
-  var ohCE = rows.reduce(function(s,r) { return s + conv(r['On-Hand Begin'], r['oz']); }, 0);
-  var ros  = weeks.map(function(w) { return rows.reduce(function(s,r) { return s + conv(r['W'+w+' ros'], r['oz']); }, 0); });
-  var inb  = weeks.map(function(w) { return rows.reduce(function(s,r) { return s + conv(r['W'+w+' inbound'], r['oz']); }, 0); });
+  var ohCE = rows.reduce(function(s,r){return s+conv(r['On-Hand Begin'],r['oz']);},0);
+  var ros  = weeks.map(function(w){return rows.reduce(function(s,r){return s+conv(r['W'+w+' ros'],r['oz']);},0);});
+  var inb  = weeks.map(function(w){return rows.reduce(function(s,r){return s+conv(r['W'+w+' inbound'],r['oz']);},0);});
 
-  var cur = ohCE;
-  var inv = weeks.map(function(w, i) { cur = Math.max(0, cur + inb[i] - ros[i]); return cur; });
+  var cur=ohCE;
+  var inv=weeks.map(function(w,i){ cur=Math.max(0,cur+inb[i]-ros[i]); return cur; });
 
-  var totalROS = ros.reduce(function(a,v){return a+v;},0);
-  var totalInb = inb.reduce(function(a,v){return a+v;},0);
-  var avgROS   = weeks.length ? totalROS / weeks.length : 0;
+  var totalROS=ros.reduce(function(a,v){return a+v;},0);
+  var totalInb=inb.reduce(function(a,v){return a+v;},0);
+  var avgROS=weeks.length?totalROS/weeks.length:0;
 
-  // OOS events
-  var oos = [];
-  rows.forEach(function(r) {
-    var runInv = conv(r['On-Hand Begin'], r['oz']);
-    weeks.forEach(function(w) {
-      var wROS  = conv(r['W'+w+' ros'],     r['oz']);
-      var wInb  = conv(r['W'+w+' inbound'], r['oz']);
-      var avail = runInv + wInb;
-      runInv = avail - wROS;
-      if (wROS > avail) {
-        oos.push({ week:w, item:r['SupplierItem']||'—', brand:r['brand']||'—', dist:r['Distributor']||'—', avail:Math.max(0,avail), ros:wROS, shortage:wROS-avail });
-      }
+  // OOS per row per week
+  var oos=[];
+  rows.forEach(function(r){
+    var runInv=conv(r['On-Hand Begin'],r['oz']);
+    weeks.forEach(function(w){
+      var wR=conv(r['W'+w+' ros'],r['oz']);
+      var wI=conv(r['W'+w+' inbound'],r['oz']);
+      var avail=runInv+wI;
+      runInv=avail-wR;
+      if (wR>avail) oos.push({week:w,item:r['SupplierItem']||'—',brand:r['brand']||'—',dist:r['Distributor']||'—',avail:Math.max(0,avail),ros:wR,shortage:wR-avail});
     });
   });
 
-  var firstWk = oos.length ? Math.min.apply(null, oos.map(function(e){return e.week;})) : null;
-  var curOOS  = firstWk !== null ? oos.filter(function(e){return e.week===firstWk;}).reduce(function(s,e){return s+e.shortage;},0) : 0;
+  var fw=oos.length?Math.min.apply(null,oos.map(function(e){return e.week;})):null;
+  var curOOS=fw!==null?oos.filter(function(e){return e.week===fw;}).reduce(function(s,e){return s+e.shortage;},0):0;
 
   // Metrics
-  document.getElementById('metrics').style.display = 'grid';
-  document.getElementById('metrics').innerHTML =
-    '<div class="mcard"><div class="lbl">Starting inventory</div><div class="val">'+fmt(ohCE)+' '+u+'</div><div class="sub">On-hand begin</div></div>' +
-    '<div class="mcard"><div class="lbl">Total inbound</div><div class="val">'+fmt(totalInb)+' '+u+'</div><div class="sub">W'+weeks[0]+'–W'+weeks[weeks.length-1]+'</div></div>' +
-    '<div class="mcard"><div class="lbl">Total depleted (ROS)</div><div class="val">'+fmt(totalROS)+' '+u+'</div><div class="sub">Avg '+fmt(avgROS)+' '+u+'/wk</div></div>' +
-    '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#A32D2D">'+(firstWk!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(firstWk!==null?'Total shortage in W'+firstWk:'No OOS detected')+'</div></div>';
+  document.getElementById('metrics').style.display='grid';
+  document.getElementById('metrics').innerHTML=
+    '<div class="mcard"><div class="lbl">Starting inventory</div><div class="val">'+fmt(ohCE)+' '+u+'</div><div class="sub">On-hand begin</div></div>'+
+    '<div class="mcard"><div class="lbl">Total inbound</div><div class="val">'+fmt(totalInb)+' '+u+'</div><div class="sub">W'+weeks[0]+'–W'+weeks[weeks.length-1]+'</div></div>'+
+    '<div class="mcard"><div class="lbl">Total depleted (ROS)</div><div class="val">'+fmt(totalROS)+' '+u+'</div><div class="sub">Avg '+fmt(avgROS)+' '+u+'/wk</div></div>'+
+    '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#c0392b">'+(fw!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(fw!==null?'Total shortage W'+fw:'No OOS detected')+'</div></div>';
 
-  // Update chart/table labels
-  document.getElementById('tROS').innerHTML = '<b>Rate of sale by week ('+u+')</b>';
-  document.getElementById('tINB').innerHTML = '<b>Inbound by week ('+u+')</b>';
-  document.getElementById('tINV').innerHTML = '<b>Projected inventory over time ('+u+')</b>';
-  document.getElementById('lROS').textContent = 'ROS ('+u+'/wk)';
-  document.getElementById('lINB').textContent = 'Inbound ('+u+')';
-  document.getElementById('hInv').textContent = 'Inventory ('+u+')';
-  document.getElementById('hRos').textContent = 'ROS ('+u+')';
-  document.getElementById('hShort').textContent = 'Shortage ('+u+')';
+  // Chart labels
+  document.getElementById('tROS').textContent='Rate of Sale by Week ('+u+')';
+  document.getElementById('tINB').textContent='Inbound by Week ('+u+')';
+  document.getElementById('tINV').textContent='Projected Inventory Over Time ('+u+')';
+  document.getElementById('lROS').textContent='ROS ('+u+'/wk)';
+  document.getElementById('lINB').textContent='Inbound ('+u+')';
+  document.getElementById('hInv').textContent='Inventory ('+u+')';
+  document.getElementById('hRos').textContent='ROS ('+u+')';
+  document.getElementById('hShort').textContent='Shortage ('+u+')';
 
-  var tickCb = function(v) { return v + ' ' + u; };
+  var tickCb=function(v){return v+' '+u;};
 
   killChart('ros');
-  chartObjs['ros'] = new Chart(document.getElementById('cROS'), {
-    type: 'bar',
-    data: { labels: wl, datasets: [{ label: 'ROS', data: ros.map(function(v){return parseFloat(fmt(v).replace(/,/g,''));}), backgroundColor: '#378ADD', borderRadius: 3 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-      scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}}, y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0} } }
+  chartObjs['ros']=new Chart(document.getElementById('cROS'),{
+    type:'bar',
+    data:{labels:wl,datasets:[{label:'ROS',data:ros.map(fnum),backgroundColor:'#2D3E50',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
 
   killChart('inb');
-  chartObjs['inb'] = new Chart(document.getElementById('cINB'), {
-    type: 'bar',
-    data: { labels: wl, datasets: [{ label: 'Inbound', data: inb.map(function(v){return parseFloat(fmt(v).replace(/,/g,''));}), backgroundColor: '#1D9E75', borderRadius: 3 }] },
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-      scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}}, y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0} } }
+  chartObjs['inb']=new Chart(document.getElementById('cINB'),{
+    type:'bar',
+    data:{labels:wl,datasets:[{label:'Inbound',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
 
   killChart('inv');
-  chartObjs['inv'] = new Chart(document.getElementById('cINV'), {
-    type: 'line',
-    data: { labels: ['Start'].concat(wl), datasets: [
-      { label:'On-hand', data:[parseFloat(fmt(ohCE).replace(/,/g,''))].concat(inv.map(function(v){return parseFloat(fmt(v).replace(/,/g,''));})), borderColor:'#185FA5', backgroundColor:'rgba(24,95,165,0.08)', borderWidth:2, pointRadius:4, pointBackgroundColor:'#185FA5', tension:0.3, fill:true },
-      { label:'Inbound', data:[null].concat(inb.map(function(v){return parseFloat(fmt(v).replace(/,/g,''));})), borderColor:'#1D9E75', backgroundColor:'transparent', borderWidth:2, borderDash:[4,3], pointRadius:3, pointBackgroundColor:'#1D9E75', tension:0.3 },
-      { label:'ROS',     data:[null].concat(ros.map(function(v){return parseFloat(fmt(v).replace(/,/g,''));})), borderColor:'#BA7517', backgroundColor:'transparent', borderWidth:2, borderDash:[4,3], pointRadius:3, pointBackgroundColor:'#BA7517', tension:0.3 }
+  chartObjs['inv']=new Chart(document.getElementById('cINV'),{
+    type:'line',
+    data:{labels:['Start'].concat(wl),datasets:[
+      {label:'On-hand',data:[fnum(ohCE)].concat(inv.map(fnum)),borderColor:'#2D3E50',backgroundColor:'rgba(45,62,80,0.07)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#2D3E50',tension:0.3,fill:true},
+      {label:'Inbound',data:[null].concat(inb.map(fnum)),borderColor:'#4AADA8',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:3,pointBackgroundColor:'#4AADA8',tension:0.3},
+      {label:'ROS',data:[null].concat(ros.map(fnum)),borderColor:'#E67E22',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:3,pointBackgroundColor:'#E67E22',tension:0.3}
     ]},
-    options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
-      scales:{ x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}}, y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0} } }
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
 
   // OOS table
-  var noOOS    = document.getElementById('noOOS');
-  var oosTable = document.getElementById('oosTable');
+  var noOOS=document.getElementById('noOOS');
+  var oosTable=document.getElementById('oosTable');
   if (!oos.length) {
     noOOS.style.display='block'; oosTable.style.display='none';
     document.getElementById('tBody').innerHTML='';
@@ -279,54 +299,53 @@ function render() {
   }
   noOOS.style.display='none'; oosTable.style.display='table';
 
-  var byWeek = {};
+  var byWeek={};
   oos.sort(function(a,b){return a.week-b.week||b.shortage-a.shortage;}).forEach(function(e){
-    if (!byWeek[e.week]) byWeek[e.week]=[];
-    if (byWeek[e.week].length < 5) byWeek[e.week].push(e);
+    if(!byWeek[e.week]) byWeek[e.week]=[];
+    if(byWeek[e.week].length<5) byWeek[e.week].push(e);
   });
 
-  document.getElementById('tBody').innerHTML = Object.keys(byWeek).map(function(w, wi) {
-    var evts = byWeek[w];
-    var hcls = wi===0 ? 'whdr first' : 'whdr';
-    var hdr  = '<tr class="'+hcls+'"><td class="l" colspan="6" style="padding:10px 10px 8px"><span style="font-size:14px;font-weight:500;color:var(--color-text-primary)">W'+w+'</span> <span style="font-size:12px;color:var(--color-text-secondary)">— Top '+evts.length+' OOS</span></td></tr>';
-    return hdr + evts.map(function(e){
-      return '<tr><td class="l">'+e.item+'</td><td class="l">'+e.brand+'</td><td class="l">'+e.dist+'</td><td>'+fmt(e.avail)+' '+u+'</td><td>'+fmt(e.ros)+' '+u+'</td><td class="neg">'+fmt(e.shortage)+' '+u+'</td></tr>';
-    }).join('');
+  document.getElementById('tBody').innerHTML=Object.keys(byWeek).map(function(w,wi){
+    var evts=byWeek[w], hcls=wi===0?'whdr first':'whdr';
+    return '<tr class="'+hcls+'"><td class="l" colspan="6" style="padding:10px 12px">W'+w+' &mdash; Top '+evts.length+' OOS Events</td></tr>'+
+      evts.map(function(e){
+        return '<tr><td class="l">'+e.item+'</td><td class="l">'+e.brand+'</td><td class="l">'+e.dist+'</td>'+
+               '<td>'+fmt(e.avail)+' '+u+'</td><td>'+fmt(e.ros)+' '+u+'</td><td class="neg">'+fmt(e.shortage)+' '+u+'</td></tr>';
+      }).join('');
   }).join('');
 }
 
 // Unit toggle
-var btns = { CE: document.getElementById('btnCE'), NL: document.getElementById('btn9L'), UN: document.getElementById('btnUN') };
-Object.keys(btns).forEach(function(k) {
-  btns[k].addEventListener('click', function() {
-    unitKey = k;
-    Object.keys(btns).forEach(function(b) { btns[b].classList.toggle('active', b===k); });
-    if (allRows.length) render();
+var btns={CE:document.getElementById('btnCE'),NL:document.getElementById('btn9L'),UN:document.getElementById('btnUN')};
+Object.keys(btns).forEach(function(k){
+  btns[k].addEventListener('click',function(){
+    unitKey=k;
+    Object.keys(btns).forEach(function(b){btns[b].classList.toggle('active',b===k);});
+    if(allRows.length) render();
   });
 });
 
 // Filters
 ['fBrand','fDist','fItem'].forEach(function(id){
-  document.getElementById(id).addEventListener('change', render);
+  document.getElementById(id).addEventListener('change',render);
 });
 
-// CSV upload
-document.getElementById('csvIn').addEventListener('change', function(e) {
-  var file = e.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    allRows = parseCSV(ev.target.result);
-    if (!allRows.length) { document.getElementById('fileInfo').textContent='Could not parse CSV.'; return; }
-    weeks = detectWeeks(Object.keys(allRows[0]));
-    if (!weeks.length) { document.getElementById('fileInfo').textContent='No weekly columns found (expected W## ros / W## inbound).'; return; }
-    document.getElementById('fileInfo').textContent = 'Loaded '+allRows.length+' rows · W'+weeks[0]+'–W'+weeks[weeks.length-1];
-    populateSel('fBrand', allRows, function(r){return r['brand'];});
-    populateSel('fDist',  allRows, function(r){return r['Distributor'];});
-    populateSel('fItem',  allRows, function(r){return r['SupplierItem'];}, function(r){return (r['brand']+' '+r['size']).trim();});
-    document.getElementById('controls').style.display  = 'block';
-    document.getElementById('metrics').style.display   = 'grid';
-    document.getElementById('chartsArea').style.display = 'block';
+// CSV
+document.getElementById('csvIn').addEventListener('change',function(e){
+  var file=e.target.files[0]; if(!file) return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    allRows=parseCSV(ev.target.result);
+    if(!allRows.length){document.getElementById('fileInfo').textContent='Could not parse CSV.';return;}
+    weeks=detectWeeks(Object.keys(allRows[0]));
+    if(!weeks.length){document.getElementById('fileInfo').textContent='No weekly columns found (expected W## ros / W## inbound).';return;}
+    document.getElementById('fileInfo').textContent='Loaded '+allRows.length+' rows · W'+weeks[0]+'–W'+weeks[weeks.length-1];
+    populateSel('fBrand',allRows,function(r){return r['brand'];});
+    populateSel('fDist', allRows,function(r){return r['Distributor'];});
+    populateSel('fItem', allRows,function(r){return r['SupplierItem'];},function(r){return(r['brand']+' '+r['size']).trim();});
+    document.getElementById('controls').style.display='block';
+    document.getElementById('metrics').style.display='grid';
+    document.getElementById('chartsArea').style.display='block';
     render();
   };
   reader.readAsText(file);
