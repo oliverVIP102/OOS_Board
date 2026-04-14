@@ -227,8 +227,8 @@ function render(){
     '<div class="mcard"><div class="lbl">OOS %</div><div class="val" style="color:#c0392b">'+(fw!==null?oosPct.toFixed(1)+'%':'N/A')+'</div><div class="sub">'+(fw!==null?'OOS \u00f7 ROS in W'+fw:'No OOS detected')+'</div></div>'+
     '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#c0392b">'+(fw!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(fw!==null?'Total shortage W'+fw:'No OOS detected')+'</div></div>';
 
-  document.getElementById('tROS').textContent='Rate of Sale by Week ('+u+')';
-  document.getElementById('tINB').textContent='Shipped to Dist by Week ('+u+')';
+  document.getElementById('tROS').textContent='Forecasted Rate of Sale by Week ('+u+')';
+  document.getElementById('tINB').textContent='Shipping to Dist by Week ('+u+')';
   document.getElementById('tINV').textContent='Projected Inventory Over Time ('+u+')';
   document.getElementById('lROS').textContent='ROS ('+u+'/wk)';
   document.getElementById('lINB').textContent='Shipped to Dist ('+u+')';
