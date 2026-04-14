@@ -93,7 +93,7 @@ tr:last-child td{border-bottom:none}
       <div class="cbox">
         <div class="ctitle" id="tINB"></div>
         <div class="legend"><span><i style="background:#4AADA8"></i><span id="lINB"></span></span></div>
-        <div style="position:relative;width:100%;height:220px"><canvas id="cINB" role="img" aria-label="Inbound bar chart"></canvas></div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="cINB" role="img" aria-label="Shipped to dist bar chart"></canvas></div>
       </div>
       <div class="cbox full">
         <div class="ctitle" id="tINV"></div>
@@ -112,7 +112,7 @@ tr:last-child td{border-bottom:none}
       <table id="oosTable" style="display:none">
         <thead><tr>
           <th class="l">Item</th><th class="l">Brand</th><th class="l">Distributor</th>
-          <th id="hInv">Inventory</th><th id="hRos">ROS</th><th id="hShort">Shortage</th>
+          <th id="hInv">Inventory</th><th id="hRos">ROS</th><th id="hShort">Shortage</th><th>Next Inbound Order</th>
         </tr></thead>
         <tbody id="tBody"></tbody>
       </table>
@@ -192,8 +192,6 @@ function render(){
   var invCur=ohCE;
   var inv=weeks.map(function(w,i){invCur=Math.max(0,invCur+inb[i]-ros[i]);return invCur;});
   var totalROS=ros.reduce(function(a,v){return a+v;},0);
-  var totalInb=inb.reduce(function(a,v){return a+v;},0);
-  var avgROS=weeks.length?totalROS/weeks.length:0;
 
   // OOS per row per week
   var oos=[];
@@ -203,29 +201,36 @@ function render(){
       var wR=conv(r['W'+w+' ros'],r['oz']),wI=conv(r['W'+w+' inbound'],r['oz']);
       var avail=ri+wI;
       ri=avail-wR;
-      if(wR>avail)oos.push({week:w,item:r['SupplierItem']||'\u2014',brand:r['brand']||'\u2014',dist:r['Distributor']||'\u2014',avail:Math.max(0,avail),ros:wR,shortage:wR-avail});
+      if(wR>avail)oos.push({week:w,item:r['SupplierItem']||'\u2014',brand:r['brand']||'\u2014',dist:r['Distributor']||'\u2014',avail:Math.max(0,avail),ros:wR,shortage:wR-avail,rawRow:r});
     });
   });
 
-  // First week with OOS for metric card
+  // First OOS week
   var oosWkNums=oos.reduce(function(acc,e){acc[e.week]=1;return acc;},{});
   var sortedOOSWks=Object.keys(oosWkNums).map(Number).sort(function(a,b){return a-b;});
   var fw=sortedOOSWks.length?sortedOOSWks[0]:null;
+
+  // Metrics derived from first OOS week
+  var firstWkIdx=fw!==null?weeks.indexOf(fw):-1;
+  var firstWkROS=firstWkIdx>=0?ros[firstWkIdx]:0;
+  var firstWkInb=firstWkIdx>=0?inb[firstWkIdx]:0;
   var curOOS=fw!==null?oos.filter(function(e){return e.week===fw;}).reduce(function(s,e){return s+e.shortage;},0):0;
+  var oosPct=firstWkROS>0?(curOOS/firstWkROS)*100:0;
 
   // Metrics
   document.getElementById('metrics').style.display='grid';
   document.getElementById('metrics').innerHTML=
-    '<div class="mcard"><div class="lbl">Starting inventory</div><div class="val">'+fmt(ohCE)+' '+u+'</div><div class="sub">On-hand begin</div></div>'+
-    '<div class="mcard"><div class="lbl">Total inbound</div><div class="val">'+fmt(totalInb)+' '+u+'</div><div class="sub">W'+weeks[0]+'\u2013W'+weeks[weeks.length-1]+'</div></div>'+
-    '<div class="mcard"><div class="lbl">Total depleted (ROS)</div><div class="val">'+fmt(totalROS)+' '+u+'</div><div class="sub">Avg '+fmt(avgROS)+' '+u+'/wk</div></div>'+
+    '<div class="mcard"><div class="lbl">Distributor Inventory</div><div class="val">'+Math.round(ohCE)+' '+u+'</div><div class="sub">On-hand begin</div></div>'+
+    '<div class="mcard"><div class="lbl">Total Distributor Shipments</div><div class="val">'+Math.round(firstWkInb)+' '+u+'</div><div class="sub">'+(fw!==null?'W'+fw:'No OOS week')+'</div></div>'+
+    '<div class="mcard"><div class="lbl">OOS %</div><div class="val" style="color:#c0392b">'+(fw!==null?oosPct.toFixed(1)+'%':'N/A')+'</div><div class="sub">'+(fw!==null?'OOS \u00f7 ROS in W'+fw:'No OOS detected')+'</div></div>'+
     '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#c0392b">'+(fw!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(fw!==null?'Total shortage W'+fw:'No OOS detected')+'</div></div>';
 
+  // Chart labels
   document.getElementById('tROS').textContent='Rate of Sale by Week ('+u+')';
-  document.getElementById('tINB').textContent='Inbound by Week ('+u+')';
+  document.getElementById('tINB').textContent='Shipped to Dist by Week ('+u+')';
   document.getElementById('tINV').textContent='Projected Inventory Over Time ('+u+')';
   document.getElementById('lROS').textContent='ROS ('+u+'/wk)';
-  document.getElementById('lINB').textContent='Inbound ('+u+')';
+  document.getElementById('lINB').textContent='Shipped to Dist ('+u+')';
   document.getElementById('hInv').textContent='Inventory ('+u+')';
   document.getElementById('hRos').textContent='ROS ('+u+')';
   document.getElementById('hShort').textContent='Shortage ('+u+')';
@@ -241,7 +246,7 @@ function render(){
 
   killChart('inb');
   chartObjs['inb']=new Chart(document.getElementById('cINB'),{
-    type:'bar',data:{labels:wl,datasets:[{label:'Inbound',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
+    type:'bar',data:{labels:wl,datasets:[{label:'Shipped to Dist',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
@@ -270,7 +275,6 @@ function render(){
   noOOS.style.display='none';
   oosTable.style.display='table';
 
-  // Build top-5 per week map (sorted by shortage desc)
   var byWeek={};
   oos.sort(function(a,b){return a.week-b.week||b.shortage-a.shortage;}).forEach(function(e){
     if(!byWeek[e.week])byWeek[e.week]=[];
@@ -282,15 +286,25 @@ function render(){
     var allEvts=oos.filter(function(e){return e.week===w;});
     var trueTotal=allEvts.reduce(function(s,e){return s+e.shortage;},0);
     var hcls=wi===0?'whdr first':'whdr';
-    return '<tr class="'+hcls+'"><td class="l" colspan="6" style="padding:10px 12px">W'+w+' \u2014 Top '+top5.length+' OOS Events</td></tr>'+
+    return '<tr class="'+hcls+'"><td class="l" colspan="7" style="padding:10px 12px">W'+w+' \u2014 Top '+top5.length+' OOS Events</td></tr>'+
       top5.map(function(e){
+        // Find next week with inbound > 0 for this row
+        var nextWk=null,nextQty=0;
+        for(var i=weeks.indexOf(e.week);i<weeks.length;i++){
+          var chkW=weeks[i];
+          var chkQty=conv(e.rawRow['W'+chkW+' inbound'],e.rawRow['oz']);
+          if(chkQty>0){nextWk=chkW;nextQty=chkQty;break;}
+        }
+        var badge=nextWk!==null
+          ?'<span style="background:#e6f4f1;color:#0F6E56;border:1px solid #1D9E75;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700">W'+nextWk+' \u2014 '+Math.round(nextQty)+' '+u+'</span>'
+          :'<span style="background:#fdf0ee;color:#993C1D;border:1px solid #D85A30;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700">None</span>';
         return '<tr><td class="l">'+e.item+'</td><td class="l">'+e.brand+'</td><td class="l">'+e.dist+'</td>'+
                '<td>'+fmt(e.avail)+' '+u+'</td><td>'+fmt(e.ros)+' '+u+'</td>'+
-               '<td class="neg">'+fmt(e.shortage)+' '+u+'</td></tr>';
+               '<td class="neg">'+fmt(e.shortage)+' '+u+'</td><td>'+badge+'</td></tr>';
       }).join('')+
       '<tr style="background:#f7fdfc;border-top:1.5px solid #4AADA8">'+
         '<td class="l" colspan="3" style="font-weight:700;color:#2D3E50;font-size:11px;text-transform:uppercase;letter-spacing:0.04em">Total</td>'+
-        '<td colspan="2"></td>'+
+        '<td colspan="3"></td>'+
         '<td style="font-weight:700;color:#c0392b">'+fmt(trueTotal)+' '+u+'</td>'+
       '</tr>';
   }).join('');
