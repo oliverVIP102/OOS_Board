@@ -191,7 +191,7 @@ function render(){
   var inb=weeks.map(function(w){return rows.reduce(function(s,r){return s+conv(r['W'+w+' inbound'],r['oz']);},0);});
   var invCur=ohCE;
   var inv=weeks.map(function(w,i){invCur=Math.max(0,invCur+inb[i]-ros[i]);return invCur;});
-  var totalROS=ros.reduce(function(a,v){return a+v;},0);
+
 
   // OOS per row per week
   var oos=[];
