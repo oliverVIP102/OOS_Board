@@ -389,6 +389,8 @@ function render(){
 }
 
 // ── Event wiring ─────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function(){
+
 document.querySelector('.unit-group').addEventListener('click', function(e){
   var btn = e.target.closest('.unit-btn');
   if(!btn) return;
@@ -429,6 +431,8 @@ document.getElementById('csvIn').addEventListener('change', function(e){
   };
   reader.readAsText(file);
 });
+
+}); // end DOMContentLoaded
 </script>
 </body>
 </html>
