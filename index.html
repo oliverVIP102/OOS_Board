@@ -69,18 +69,18 @@ tr:last-child td{border-bottom:none}
     <div class="filter-row">
       <label>Unit:</label>
       <div class="unit-group">
-        <button class="unit-btn active" data-unit="CE">Case Equivalent (CE)</button>
-        <button class="unit-btn" data-unit="NL">9-Liter Equivalent (9L)</button>
-        <button class="unit-btn" data-unit="UN">Individual Units</button>
+        <button class="unit-btn active" id="btnCE" onclick="setUnit('CE')">Case Equivalent (CE)</button>
+        <button class="unit-btn" id="btnNL" onclick="setUnit('NL')">9-Liter Equivalent (9L)</button>
+        <button class="unit-btn" id="btnUN" onclick="setUnit('UN')">Individual Units</button>
       </div>
     </div>
     <div class="filter-row">
       <label>Brand:</label>
-      <select id="fBrand"><option value="">All brands</option></select>
+      <select id="fBrand" onchange="onBrandChange()"><option value="">All brands</option></select>
       <label>Distributor:</label>
-      <select id="fDist"><option value="">All distributors</option></select>
+      <select id="fDist" onchange="onDistChange()"><option value="">All distributors</option></select>
       <label>Item:</label>
-      <select id="fItem"><option value="">All items</option></select>
+      <select id="fItem" onchange="render()"><option value="">All items</option></select>
     </div>
   </div>
 
@@ -117,31 +117,29 @@ tr:last-child td{border-bottom:none}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// ── State ────────────────────────────────────────────────────────
 var allRows = [];
 var weeks   = [];
 var unitKey = 'CE';
 var charts  = {};
 var UNITS   = { CE:{label:'CE',div:288}, NL:{label:'9L',div:304.326}, UN:{label:'Units',div:null} };
 
-// ── Helpers ──────────────────────────────────────────────────────
 function num(v){ var x=parseFloat(v); return isNaN(x)?0:x; }
-
-function toVal(units, oz){
-  if(unitKey==='UN') return num(units);
-  return (num(units)*num(oz)) / UNITS[unitKey].div;
-}
-
+function toVal(units,oz){ if(unitKey==='UN') return num(units); return (num(units)*num(oz))/UNITS[unitKey].div; }
 function ul(){ return UNITS[unitKey].label; }
-
-function fmt(v){
-  if(unitKey==='UN') return Math.round(v).toLocaleString();
-  return v.toFixed(2);
-}
-
+function fmt(v){ if(unitKey==='UN') return Math.round(v).toLocaleString(); return v.toFixed(2); }
 function fnum(v){ return parseFloat(String(fmt(v)).replace(/,/g,'')); }
 
-// ── CSV parsing ──────────────────────────────────────────────────
+function setUnit(k){
+  unitKey=k;
+  var ids=['btnCE','btnNL','btnUN'];
+  var keys=['CE','NL','UN'];
+  for(var i=0;i<ids.length;i++){
+    var el=document.getElementById(ids[i]);
+    if(el){ if(keys[i]===k) el.className='unit-btn active'; else el.className='unit-btn'; }
+  }
+  if(allRows.length) render();
+}
+
 function splitLine(line){
   var cols=[],cur='',inQ=false;
   for(var i=0;i<line.length;i++){
@@ -155,136 +153,153 @@ function splitLine(line){
 }
 
 function parseCSV(text){
-  var lines   = text.trim().split('\n');
-  var headers = splitLine(lines[0]).map(function(h){ return h.trim(); });
-  return lines.slice(1).map(function(line){
-    var cols=splitLine(line), obj={};
-    headers.forEach(function(h,i){ obj[h]=(cols[i]||'').trim(); });
-    return obj;
-  }).filter(function(r){ return Object.keys(r).length>2; });
+  var lines=text.trim().split('\n');
+  var headers=splitLine(lines[0]);
+  for(var i=0;i<headers.length;i++) headers[i]=headers[i].trim();
+  var result=[];
+  for(var r=1;r<lines.length;r++){
+    var cols=splitLine(lines[r]),obj={};
+    for(var c=0;c<headers.length;c++) obj[headers[c]]=(cols[c]||'').trim();
+    if(Object.keys(obj).length>2) result.push(obj);
+  }
+  return result;
 }
 
 function detectWeeks(headers){
   var seen={};
-  headers.forEach(function(h){ var m=h.match(/^W(\d+)\s/i); if(m) seen[parseInt(m[1])]=1; });
+  for(var i=0;i<headers.length;i++){
+    var m=headers[i].match(/^W(\d+)\s/i);
+    if(m) seen[parseInt(m[1])]=1;
+  }
   return Object.keys(seen).map(Number).sort(function(a,b){return a-b;});
 }
 
-// ── Dropdown helpers ─────────────────────────────────────────────
-function fillSel(id, items){
-  var sel = document.getElementById(id);
-  var cur = sel.value;
-  sel.innerHTML = '<option value="">All</option>';
-  items.sort().forEach(function(v){
-    var o = document.createElement('option');
-    o.value = v; o.textContent = v;
-    sel.appendChild(o);
-  });
-  // restore previous selection if still valid
-  if(cur && sel.querySelector('option[value="'+cur+'"]')) sel.value = cur;
+function uniqueVals(rows,key){
+  var seen={},out=[];
+  for(var i=0;i<rows.length;i++){
+    var v=(rows[i][key]||'').trim();
+    if(v&&!seen[v]){seen[v]=1;out.push(v);}
+  }
+  out.sort();
+  return out;
 }
 
-function uniqueVals(rows, key){
-  var seen={};
-  rows.forEach(function(r){ var v=(r[key]||'').trim(); if(v) seen[v]=1; });
-  return Object.keys(seen);
+function fillSel(id,vals,withLabel){
+  var sel=document.getElementById(id);
+  if(!sel) return;
+  var prev=sel.value;
+  sel.innerHTML='<option value="">All</option>';
+  for(var i=0;i<vals.length;i++){
+    var o=document.createElement('option');
+    o.value=vals[i];
+    o.textContent=withLabel?vals[i]+' \u2014 '+withLabel[vals[i]]:vals[i];
+    sel.appendChild(o);
+  }
+  // restore previous selection if still present
+  var opts=sel.options;
+  for(var j=0;j<opts.length;j++){
+    if(opts[j].value===prev){sel.value=prev;break;}
+  }
 }
 
 function rebuildDropdowns(){
-  var b  = document.getElementById('fBrand').value;
-  var d  = document.getElementById('fDist').value;
+  var b=(document.getElementById('fBrand').value||'').trim();
+  var d=(document.getElementById('fDist').value||'').trim();
 
-  // Brand always comes from all rows
-  fillSel('fBrand', uniqueVals(allRows, 'brand'));
+  // Brand — always all rows
+  fillSel('fBrand', uniqueVals(allRows,'brand'));
 
-  // Distributor scoped to selected brand
-  var forDist = b ? allRows.filter(function(r){ return (r['brand']||'').trim()===b; }) : allRows;
-  fillSel('fDist', uniqueVals(forDist, 'Distributor'));
+  // Distributor — scoped to brand
+  var forDist=[];
+  for(var i=0;i<allRows.length;i++){
+    if(!b||(allRows[i]['brand']||'').trim()===b) forDist.push(allRows[i]);
+  }
+  fillSel('fDist', uniqueVals(forDist,'Distributor'));
 
-  // Item scoped to selected brand + distributor
-  var forItem = forDist;
-  if(d) forItem = forDist.filter(function(r){ return (r['Distributor']||'').trim()===d; });
-  var itemSel = document.getElementById('fItem');
-  var curItem = itemSel.value;
-  itemSel.innerHTML = '<option value="">All items</option>';
-  var itemMap = {};
-  forItem.forEach(function(r){
-    var k=(r['SupplierItem']||'').trim();
-    if(k&&!itemMap[k]) itemMap[k]=(r['brand']+' '+r['size']).trim();
-  });
-  Object.keys(itemMap).sort().forEach(function(k){
-    var o=document.createElement('option');
-    o.value=k; o.textContent=k+' \u2014 '+itemMap[k];
-    itemSel.appendChild(o);
-  });
-  if(curItem && itemSel.querySelector('option[value="'+curItem+'"]')) itemSel.value=curItem;
+  // Item — scoped to brand+dist
+  var forItem=[];
+  for(var i=0;i<forDist.length;i++){
+    if(!d||(forDist[i]['Distributor']||'').trim()===d) forItem.push(forDist[i]);
+  }
+  var itemMap={},itemKeys=[];
+  for(var i=0;i<forItem.length;i++){
+    var k=(forItem[i]['SupplierItem']||'').trim();
+    if(k&&!itemMap[k]){itemMap[k]=(forItem[i]['brand']+' '+forItem[i]['size']).trim();itemKeys.push(k);}
+  }
+  itemKeys.sort();
+  fillSel('fItem',itemKeys,itemMap);
 }
 
-// ── Filtering ────────────────────────────────────────────────────
+function onBrandChange(){ rebuildDropdowns(); render(); }
+function onDistChange(){  rebuildDropdowns(); render(); }
+
 function getFiltered(){
-  var b  = (document.getElementById('fBrand').value||'').trim();
-  var d  = (document.getElementById('fDist').value||'').trim();
-  var it = (document.getElementById('fItem').value||'').trim();
-  return allRows.filter(function(r){
-    if(b  && (r['brand']       ||'').trim() !== b)  return false;
-    if(d  && (r['Distributor'] ||'').trim() !== d)  return false;
-    if(it && (r['SupplierItem']||'').trim() !== it) return false;
-    return true;
-  });
+  var b=(document.getElementById('fBrand').value||'').trim();
+  var d=(document.getElementById('fDist').value||'').trim();
+  var it=(document.getElementById('fItem').value||'').trim();
+  var out=[];
+  for(var i=0;i<allRows.length;i++){
+    var r=allRows[i];
+    if(b&&(r['brand']||'').trim()!==b) continue;
+    if(d&&(r['Distributor']||'').trim()!==d) continue;
+    if(it&&(r['SupplierItem']||'').trim()!==it) continue;
+    out.push(r);
+  }
+  return out;
 }
 
-// ── Chart helpers ────────────────────────────────────────────────
 function killChart(id){ if(charts[id]){ charts[id].destroy(); delete charts[id]; } }
 
-// ── Main render ──────────────────────────────────────────────────
 function render(){
-  var rows = getFiltered();
+  var rows=getFiltered();
   if(!rows.length) return;
+  var u=ul(),wl=[],gc='rgba(0,0,0,0.05)',tc='#999';
+  for(var i=0;i<weeks.length;i++) wl.push('W'+weeks[i]);
 
-  var u  = ul();
-  var wl = weeks.map(function(w){ return 'W'+w; });
-  var gc = 'rgba(0,0,0,0.05)', tc = '#999';
+  var ohCE=0;
+  for(var i=0;i<rows.length;i++) ohCE+=toVal(rows[i]['On-Hand Begin'],rows[i]['oz']);
 
-  // Aggregates
-  var ohCE = rows.reduce(function(s,r){ return s+toVal(r['On-Hand Begin'],r['oz']); }, 0);
-  var ros  = weeks.map(function(w){ return rows.reduce(function(s,r){ return s+toVal(r['W'+w+' ros'],r['oz']); }, 0); });
-  var inb  = weeks.map(function(w){ return rows.reduce(function(s,r){ return s+toVal(r['W'+w+' inbound'],r['oz']); }, 0); });
+  var ros=[],inb=[];
+  for(var i=0;i<weeks.length;i++){
+    var w=weeks[i],rs=0,ib=0;
+    for(var j=0;j<rows.length;j++){
+      rs+=toVal(rows[j]['W'+w+' ros'],rows[j]['oz']);
+      ib+=toVal(rows[j]['W'+w+' inbound'],rows[j]['oz']);
+    }
+    ros.push(rs); inb.push(ib);
+  }
 
-  var invCur = ohCE;
-  var inv = weeks.map(function(w,i){ invCur=Math.max(0,invCur+inb[i]-ros[i]); return invCur; });
+  var invCur=ohCE,inv=[];
+  for(var i=0;i<weeks.length;i++){
+    invCur=Math.max(0,invCur+inb[i]-ros[i]);
+    inv.push(invCur);
+  }
 
-  var totalROS = ros.reduce(function(a,v){return a+v;},0);
-  var totalInb = inb.reduce(function(a,v){return a+v;},0);
-  var avgROS   = weeks.length ? totalROS/weeks.length : 0;
-
-  // OOS calculation
+  // OOS
   var oos=[];
-  rows.forEach(function(r){
-    var ri = toVal(r['On-Hand Begin'], r['oz']);
-    weeks.forEach(function(w){
-      var wR   = toVal(r['W'+w+' ros'],     r['oz']);
-      var wI   = toVal(r['W'+w+' inbound'], r['oz']);
-      var avail = Math.max(0,ri) + wI;
-      var short = wR - avail;
-      ri = avail - wR;
-      if(short>0) oos.push({
-        week:w, item:(r['SupplierItem']||'\u2014').trim(),
-        brand:(r['brand']||'\u2014').trim(), dist:(r['Distributor']||'\u2014').trim(),
-        avail:avail, ros:wR, shortage:short, rawRow:r, rawOz:r['oz']
-      });
-    });
-  });
+  for(var ri=0;ri<rows.length;ri++){
+    var r=rows[ri],runInv=toVal(r['On-Hand Begin'],r['oz']);
+    for(var wi=0;wi<weeks.length;wi++){
+      var w=weeks[wi];
+      var wR=toVal(r['W'+w+' ros'],r['oz']),wI=toVal(r['W'+w+' inbound'],r['oz']);
+      var avail=Math.max(0,runInv)+wI,shortage=wR-avail;
+      runInv=avail-wR;
+      if(shortage>0) oos.push({week:w,item:(r['SupplierItem']||'-').trim(),brand:(r['brand']||'-').trim(),dist:(r['Distributor']||'-').trim(),avail:avail,ros:wR,shortage:shortage,rawRow:r,rawOz:r['oz']});
+    }
+  }
 
-  var oosWks = oos.reduce(function(a,e){a[e.week]=1;return a;},{});
-  var sortedWks = Object.keys(oosWks).map(Number).sort(function(a,b){return a-b;});
-  var fw = sortedWks.length ? sortedWks[0] : null;
-  var fwIdx = fw!==null ? weeks.indexOf(fw) : -1;
-  var firstWkInb = fwIdx>=0 ? inb[fwIdx] : 0;
-  var firstWkROS = fwIdx>=0 ? ros[fwIdx] : 0;
-  var curOOS = fw!==null ? oos.filter(function(e){return e.week===fw;}).reduce(function(s,e){return s+e.shortage;},0) : 0;
-  var oosPct = firstWkROS>0 ? (curOOS/firstWkROS)*100 : 0;
+  var oosWkMap={};
+  for(var i=0;i<oos.length;i++) oosWkMap[oos[i].week]=1;
+  var sortedWks=Object.keys(oosWkMap).map(Number).sort(function(a,b){return a-b;});
+  var fw=sortedWks.length?sortedWks[0]:null;
+  var fwIdx=fw!==null?weeks.indexOf(fw):-1;
+  var firstWkInb=fwIdx>=0?inb[fwIdx]:0;
+  var firstWkROS=fwIdx>=0?ros[fwIdx]:0;
+  var curOOS=0;
+  if(fw!==null) for(var i=0;i<oos.length;i++) if(oos[i].week===fw) curOOS+=oos[i].shortage;
+  var oosPct=firstWkROS>0?(curOOS/firstWkROS)*100:0;
 
-  // ── Metrics ──
+  // Metrics
   document.getElementById('metrics').style.display='grid';
   document.getElementById('metrics').innerHTML=
     '<div class="mcard"><div class="lbl">Distributor Inventory</div><div class="val">'+Math.round(ohCE)+' '+u+'</div><div class="sub">On-hand begin</div></div>'+
@@ -292,147 +307,111 @@ function render(){
     '<div class="mcard"><div class="lbl">OOS %</div><div class="val" style="color:#c0392b">'+(fw!==null?oosPct.toFixed(1)+'%':'N/A')+'</div><div class="sub">'+(fw!==null?'OOS \u00f7 ROS in W'+fw:'No OOS detected')+'</div></div>'+
     '<div class="mcard"><div class="lbl">Current Week OOS</div><div class="val" style="color:#c0392b">'+(fw!==null?fmt(curOOS)+' '+u:'None')+'</div><div class="sub">'+(fw!==null?'Total shortage W'+fw:'No OOS detected')+'</div></div>';
 
-  // ── Chart labels ──
-  document.getElementById('tROS').textContent = 'Forecasted Rate of Sale by Week ('+u+')';
-  document.getElementById('tINB').textContent = 'Shipping to Dist by Week ('+u+')';
-  document.getElementById('tINV').textContent = 'Projected Inventory Over Time ('+u+')';
-  document.getElementById('lROS').textContent = 'ROS ('+u+'/wk)';
-  document.getElementById('lINB').textContent = 'Shipping to Dist ('+u+')';
+  document.getElementById('tROS').textContent='Forecasted Rate of Sale by Week ('+u+')';
+  document.getElementById('tINB').textContent='Shipping to Dist by Week ('+u+')';
+  document.getElementById('tINV').textContent='Projected Inventory Over Time ('+u+')';
+  document.getElementById('lROS').textContent='ROS ('+u+'/wk)';
+  document.getElementById('lINB').textContent='Shipping to Dist ('+u+')';
 
-  var tickCb = function(v){ return v+' '+u; };
-
-  // ROS line chart with padding
-  var rosVals = ros.map(fnum);
-  var rosMin  = Math.min.apply(null,rosVals);
-  var rosMax  = Math.max.apply(null,rosVals);
-  var rosPad  = (rosMax-rosMin)*1.5 || rosMax*1.5 || 1;
+  var tickCb=function(v){return v+' '+u;};
+  var rosVals=[];
+  for(var i=0;i<ros.length;i++) rosVals.push(fnum(ros[i]));
+  var rosMin=rosVals[0],rosMax=rosVals[0];
+  for(var i=1;i<rosVals.length;i++){if(rosVals[i]<rosMin)rosMin=rosVals[i];if(rosVals[i]>rosMax)rosMax=rosVals[i];}
+  var rosPad=(rosMax-rosMin)*1.5||rosMax*1.5||1;
 
   killChart('ros');
   charts['ros']=new Chart(document.getElementById('cROS'),{
-    type:'line',
-    data:{labels:wl,datasets:[{label:'ROS',data:rosVals,borderColor:'#2D3E50',backgroundColor:'rgba(45,62,80,0.07)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#2D3E50',tension:0.3,fill:true}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},
-              y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},
-                 min:Math.max(0,Math.floor(rosMin-rosPad)),max:Math.ceil(rosMax+rosPad)}}}
+    type:'line',data:{labels:wl,datasets:[{label:'ROS',data:rosVals,borderColor:'#2D3E50',backgroundColor:'rgba(45,62,80,0.07)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#2D3E50',tension:0.3,fill:true}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:Math.max(0,Math.floor(rosMin-rosPad)),max:Math.ceil(rosMax+rosPad)}}}
   });
 
+  var inbVals=[];
+  for(var i=0;i<inb.length;i++) inbVals.push(fnum(inb[i]));
   killChart('inb');
   charts['inb']=new Chart(document.getElementById('cINB'),{
-    type:'bar',
-    data:{labels:wl,datasets:[{label:'Inbound',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
+    type:'bar',data:{labels:wl,datasets:[{label:'Inbound',data:inbVals,backgroundColor:'#4AADA8',borderRadius:3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
 
+  var invVals=[fnum(ohCE)];
+  for(var i=0;i<inv.length;i++) invVals.push(fnum(inv[i]));
+  var inbVals2=[null];
+  for(var i=0;i<inb.length;i++) inbVals2.push(fnum(inb[i]));
+  var rosVals2=[null];
+  for(var i=0;i<ros.length;i++) rosVals2.push(fnum(ros[i]));
+  var invLabels=['Start'].concat(wl);
   killChart('inv');
   charts['inv']=new Chart(document.getElementById('cINV'),{
-    type:'line',
-    data:{labels:['Start'].concat(wl),datasets:[
-      {label:'On-hand',data:[fnum(ohCE)].concat(inv.map(fnum)),borderColor:'#2D3E50',backgroundColor:'rgba(45,62,80,0.07)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#2D3E50',tension:0.3,fill:true},
-      {label:'Inbound',data:[null].concat(inb.map(fnum)),borderColor:'#4AADA8',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:3,pointBackgroundColor:'#4AADA8',tension:0.3},
-      {label:'ROS',    data:[null].concat(ros.map(fnum)),borderColor:'#E67E22',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:3,pointBackgroundColor:'#E67E22',tension:0.3}
+    type:'line',data:{labels:invLabels,datasets:[
+      {label:'On-hand',data:invVals,borderColor:'#2D3E50',backgroundColor:'rgba(45,62,80,0.07)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#2D3E50',tension:0.3,fill:true},
+      {label:'Inbound',data:inbVals2,borderColor:'#4AADA8',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:3,pointBackgroundColor:'#4AADA8',tension:0.3},
+      {label:'ROS',data:rosVals2,borderColor:'#E67E22',backgroundColor:'transparent',borderWidth:2,borderDash:[4,3],pointRadius:3,pointBackgroundColor:'#E67E22',tension:0.3}
     ]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
 
-  // ── OOS table ──
-  var wrap = document.getElementById('oosBody');
-  if(!oos.length){
-    wrap.innerHTML='<div class="nooos">No OOS events detected for the selected filters.</div>';
-    return;
-  }
+  // OOS table
+  var wrap=document.getElementById('oosBody');
+  if(!oos.length){wrap.innerHTML='<div class="nooos">No OOS events detected for the selected filters.</div>';return;}
 
+  oos.sort(function(a,b){return a.week-b.week||b.shortage-a.shortage;});
   var byWeek={};
-  oos.sort(function(a,b){return a.week-b.week||b.shortage-a.shortage;}).forEach(function(e){
+  for(var i=0;i<oos.length;i++){
+    var e=oos[i];
     if(!byWeek[e.week]) byWeek[e.week]=[];
     if(byWeek[e.week].length<5) byWeek[e.week].push(e);
-  });
+  }
 
   var html='<table><thead><tr>'+
     '<th class="l">Item</th><th class="l">Brand</th><th class="l">Distributor</th>'+
     '<th>Inventory ('+u+')</th><th>ROS ('+u+')</th><th>Shortage ('+u+')</th><th>Next Inbound Order</th>'+
     '</tr></thead><tbody>';
 
-  sortedWks.forEach(function(w,wi){
-    var top5    = byWeek[w];
-    var allEvts = oos.filter(function(e){return e.week===w;});
-    var total   = allEvts.reduce(function(s,e){return s+e.shortage;},0);
-    var hcls    = wi===0?'whdr first':'whdr';
-
+  for(var wi=0;wi<sortedWks.length;wi++){
+    var w=sortedWks[wi],top5=byWeek[w],total=0;
+    for(var i=0;i<oos.length;i++) if(oos[i].week===w) total+=oos[i].shortage;
+    var hcls=wi===0?'whdr first':'whdr';
     html+='<tr class="'+hcls+'"><td class="l" colspan="7" style="padding:10px 12px">W'+w+' \u2014 Top '+top5.length+' OOS Events</td></tr>';
-
-    top5.forEach(function(e){
-      var nextWk=null, nextQty=0;
-      for(var i=weeks.indexOf(e.week);i<weeks.length;i++){
-        var cw=weeks[i], cq=toVal(e.rawRow['W'+cw+' inbound'],e.rawOz);
+    for(var i=0;i<top5.length;i++){
+      var e=top5[i],nextWk=null,nextQty=0;
+      for(var k=weeks.indexOf(e.week);k<weeks.length;k++){
+        var cw=weeks[k],cq=toVal(e.rawRow['W'+cw+' inbound'],e.rawOz);
         if(cq>0){nextWk=cw;nextQty=cq;break;}
       }
-      var badge = nextWk!==null
-        ? '<span style="background:#e6f4f1;color:#0F6E56;border:1px solid #1D9E75;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700">W'+nextWk+' \u2014 '+Math.round(nextQty)+' '+u+'</span>'
-        : '<span style="background:#fdf0ee;color:#993C1D;border:1px solid #D85A30;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700">None</span>';
-      html+='<tr>'+
-        '<td class="l">'+e.item+'</td><td class="l">'+e.brand+'</td><td class="l">'+e.dist+'</td>'+
+      var badge=nextWk!==null
+        ?'<span style="background:#e6f4f1;color:#0F6E56;border:1px solid #1D9E75;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700">W'+nextWk+' \u2014 '+Math.round(nextQty)+' '+u+'</span>'
+        :'<span style="background:#fdf0ee;color:#993C1D;border:1px solid #D85A30;border-radius:3px;padding:2px 8px;font-size:10px;font-weight:700">None</span>';
+      html+='<tr><td class="l">'+e.item+'</td><td class="l">'+e.brand+'</td><td class="l">'+e.dist+'</td>'+
         '<td>'+fmt(e.avail)+' '+u+'</td><td>'+fmt(e.ros)+' '+u+'</td>'+
         '<td class="neg">'+fmt(e.shortage)+' '+u+'</td><td>'+badge+'</td></tr>';
-    });
-
+    }
     html+='<tr style="background:#f7fdfc;border-top:1.5px solid #4AADA8">'+
       '<td class="l" colspan="3" style="font-weight:700;color:#2D3E50;font-size:11px;text-transform:uppercase;letter-spacing:0.04em">Total</td>'+
-      '<td colspan="3"></td>'+
-      '<td style="font-weight:700;color:#c0392b">'+fmt(total)+' '+u+'</td></tr>';
-  });
-
+      '<td colspan="3"></td><td style="font-weight:700;color:#c0392b">'+fmt(total)+' '+u+'</td></tr>';
+  }
   html+='</tbody></table>';
   wrap.innerHTML=html;
 }
 
-// ── Event wiring ─────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', function(){
-
-document.querySelector('.unit-group').addEventListener('click', function(e){
-  var btn = e.target.closest('.unit-btn');
-  if(!btn) return;
-  unitKey = btn.dataset.unit;
-  document.querySelectorAll('.unit-btn').forEach(function(b){ b.classList.toggle('active', b===btn); });
-  if(allRows.length) render();
-});
-
-document.getElementById('fBrand').addEventListener('change', function(){
-  rebuildDropdowns();
-  render();
-});
-
-document.getElementById('fDist').addEventListener('change', function(){
-  rebuildDropdowns();
-  render();
-});
-
-document.getElementById('fItem').addEventListener('change', function(){
-  render();
-});
-
-document.getElementById('csvIn').addEventListener('change', function(e){
-  var file = e.target.files[0];
+document.getElementById('csvIn').onchange=function(e){
+  var file=e.target.files[0];
   if(!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev){
-    allRows = parseCSV(ev.target.result);
-    if(!allRows.length){ document.getElementById('fileInfo').textContent='Could not parse CSV.'; return; }
-    weeks = detectWeeks(Object.keys(allRows[0]));
-    if(!weeks.length){ document.getElementById('fileInfo').textContent='No weekly columns found.'; return; }
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    allRows=parseCSV(ev.target.result);
+    if(!allRows.length){document.getElementById('fileInfo').textContent='Could not parse CSV.';return;}
+    weeks=detectWeeks(Object.keys(allRows[0]));
+    if(!weeks.length){document.getElementById('fileInfo').textContent='No weekly columns found.';return;}
     document.getElementById('fileInfo').textContent='Loaded '+allRows.length+' rows \u00b7 W'+weeks[0]+'\u2013W'+weeks[weeks.length-1];
     rebuildDropdowns();
-    document.getElementById('controls').style.display  = 'block';
-    document.getElementById('metrics').style.display   = 'grid';
-    document.getElementById('chartsArea').style.display= 'block';
+    document.getElementById('controls').style.display='block';
+    document.getElementById('metrics').style.display='grid';
+    document.getElementById('chartsArea').style.display='block';
     render();
   };
   reader.readAsText(file);
-});
-
-}); // end DOMContentLoaded
+};
 </script>
 </body>
 </html>
