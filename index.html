@@ -96,12 +96,12 @@ tr:last-child td{border-bottom:none}
       <div class="cbox">
         <div class="ctitle" id="tROS"></div>
         <div class="legend"><span><i style="background:#2D3E50"></i><span id="lROS"></span></span></div>
-        <div style="position:relative;width:100%;height:220px"><canvas id="cROS" role="img" aria-label="Rate of sale bar chart"></canvas></div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="cROS" role="img" aria-label="Forecasted rate of sale line chart"></canvas></div>
       </div>
       <div class="cbox">
         <div class="ctitle" id="tINB"></div>
         <div class="legend"><span><i style="background:#4AADA8"></i><span id="lINB"></span></span></div>
-        <div style="position:relative;width:100%;height:220px"><canvas id="cINB" role="img" aria-label="Shipped to dist bar chart"></canvas></div>
+        <div style="position:relative;width:100%;height:220px"><canvas id="cINB" role="img" aria-label="Shipping to dist bar chart"></canvas></div>
       </div>
       <div class="cbox full">
         <div class="ctitle" id="tINV"></div>
@@ -205,9 +205,10 @@ function render(){
     var ri=conv(r['On-Hand Begin'],r['oz']);
     weeks.forEach(function(w){
       var wR=conv(r['W'+w+' ros'],r['oz']),wI=conv(r['W'+w+' inbound'],r['oz']);
-      var avail=ri+wI;
-      ri=avail-wR;
-      if(wR>avail)oos.push({week:w,item:r['SupplierItem']||'\u2014',brand:r['brand']||'\u2014',dist:r['Distributor']||'\u2014',avail:Math.max(0,avail),ros:wR,shortage:wR-avail,rawRow:r});
+      var avail=Math.max(0,ri)+wI; // inventory can't go below 0 before adding inbound
+      var shortage=wR-avail;
+      ri=avail-wR; // carry forward (may go negative, clamped next iteration)
+      if(shortage>0)oos.push({week:w,item:r['SupplierItem']||'\u2014',brand:r['brand']||'\u2014',dist:r['Distributor']||'\u2014',avail:avail,ros:wR,shortage:shortage,rawRow:r});
     });
   });
 
@@ -231,23 +232,27 @@ function render(){
   document.getElementById('tINB').textContent='Shipping to Dist by Week ('+u+')';
   document.getElementById('tINV').textContent='Projected Inventory Over Time ('+u+')';
   document.getElementById('lROS').textContent='ROS ('+u+'/wk)';
-  document.getElementById('lINB').textContent='Shipped to Dist ('+u+')';
+  document.getElementById('lINB').textContent='Shipping to Dist ('+u+')';
   document.getElementById('hInv').textContent='Inventory ('+u+')';
   document.getElementById('hRos').textContent='ROS ('+u+')';
   document.getElementById('hShort').textContent='Shortage ('+u+')';
 
   var tickCb=function(v){return v+' '+u;};
 
+  var rosMin=Math.min.apply(null,ros.map(fnum));
+  var rosMax=Math.max.apply(null,ros.map(fnum));
+  var rosPad=(rosMax-rosMin)*1.5||rosMax*1.5||1;
+
   killChart('ros');
   chartObjs['ros']=new Chart(document.getElementById('cROS'),{
-    type:'bar',data:{labels:wl,datasets:[{label:'ROS',data:ros.map(fnum),backgroundColor:'#2D3E50',borderRadius:3}]},
+    type:'line',data:{labels:wl,datasets:[{label:'ROS',data:ros.map(fnum),borderColor:'#2D3E50',backgroundColor:'rgba(45,62,80,0.07)',borderWidth:2,pointRadius:4,pointBackgroundColor:'#2D3E50',tension:0.3,fill:true}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
+      scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:Math.max(0,Math.floor(rosMin-rosPad)),max:Math.ceil(rosMax+rosPad)}}}
   });
 
   killChart('inb');
   chartObjs['inb']=new Chart(document.getElementById('cINB'),{
-    type:'bar',data:{labels:wl,datasets:[{label:'Shipped to Dist',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
+    type:'bar',data:{labels:wl,datasets:[{label:'Shipping to Dist',data:inb.map(fnum),backgroundColor:'#4AADA8',borderRadius:3}]},
     options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
       scales:{x:{ticks:{color:tc,font:{size:11}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:11},callback:tickCb},grid:{color:gc},min:0}}}
   });
@@ -267,13 +272,10 @@ function render(){
   var noOOS=document.getElementById('noOOS');
   var oosTable=document.getElementById('oosTable');
   if(!oos.length){
-    noOOS.style.display='block';
-    oosTable.style.display='none';
-    document.getElementById('tBody').innerHTML='';
-    return;
+    noOOS.style.display='block';oosTable.style.display='none';
+    document.getElementById('tBody').innerHTML='';return;
   }
-  noOOS.style.display='none';
-  oosTable.style.display='table';
+  noOOS.style.display='none';oosTable.style.display='table';
 
   var byWeek={};
   oos.sort(function(a,b){return a.week-b.week||b.shortage-a.shortage;}).forEach(function(e){
@@ -290,8 +292,7 @@ function render(){
       top5.map(function(e){
         var nextWk=null,nextQty=0;
         for(var i=weeks.indexOf(e.week);i<weeks.length;i++){
-          var chkW=weeks[i];
-          var chkQty=conv(e.rawRow['W'+chkW+' inbound'],e.rawRow['oz']);
+          var chkW=weeks[i],chkQty=conv(e.rawRow['W'+chkW+' inbound'],e.rawRow['oz']);
           if(chkQty>0){nextWk=chkW;nextQty=chkQty;break;}
         }
         var badge=nextWk!==null
